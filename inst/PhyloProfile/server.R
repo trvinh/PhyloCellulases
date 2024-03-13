@@ -38,10 +38,14 @@ shinyServer(function(input, output, session) {
     })
     
     # ========================== PRE-DEFINED VARIABLES =========================
+    fasta_file <- "data/cellulase_all.extended.fa"
+    
     var1ID <- "FAS_F"
     var2ID <- "FAS_B"
+    seedSource <- "ncbi"
+    orthoSource <- "ncbi"
 
-    # * check for the existence of taxonomy files ------------------------------
+    # # * check for the existence of taxonomy files ------------------------------
     # observe({
     #     fileExist <- file.exists("data/preProcessedTaxonomy.txt")
     #     if (fileExist == FALSE) {
@@ -2923,7 +2927,7 @@ shinyServer(function(input, output, session) {
     # ============================= DETAILED PLOT ==============================
     # * data for detailed plot -------------------------------------------------
     detailPlotDt <- reactive({
-        req(v$doPlot)
+        # req(v$doPlot)
         req(input$detailedBtn)
         # GET INFO BASED ON CURRENT TAB
         if (input$tabs == "Main profile") {
@@ -2940,6 +2944,9 @@ shinyServer(function(input, output, session) {
 
             ### get info for present taxa in selected supertaxon (1)
             fullDf <- getFullData()
+            if (input$tabs == "Customized profile") {
+                fullDf <- readRDS(paste0("data/fullMdDatastrain.rds"))
+            }
             ### filter data if needed
             if  (input$detailedFilter == TRUE) {
                 fullDf <- filteredDataHeat()
@@ -2965,9 +2972,12 @@ shinyServer(function(input, output, session) {
                             & fullDf$supertaxon == plotTaxon, ]
             ### get all taxa of this supertaxon (2)
             allTaxaDf <- sortedtaxaList()
+            if (input$tabs == "Customized profile") {
+                allTaxaDf <- readRDS(paste0("data/sortedInputstrain.rds"))
+            }
             allTaxaDf <- allTaxaDf[allTaxaDf$supertaxon == plotTaxon,
                                    c("abbrName", "fullName")]
-
+            
             ### merge (1) and (2) together
             joinedDf <- merge(selDf, allTaxaDf, by = c("abbrName"), all.y =TRUE)
             joinedDf <- subset(
@@ -3046,15 +3056,20 @@ shinyServer(function(input, output, session) {
             seedId <- parseProId(seedId, input$separator, input$seqIdFormat)
         }
         if (length(seedId) > 0) {
-            if (input$seedSource == "ncbi") {
-                linkText <- paste0(linkText, createDBlink(seedId, "NCBI"))
-            } else if (input$seedSource == "uniprot") {
-                linkText <- paste0(linkText, createDBlink(seedId, "UniProt"))
-            } else if (input$seedSource == "orthodb") {
-                linkText <- paste0(linkText, createDBlink(seedId, "OrthoDB", input$orthodbSeedVer))
-            } else if (input$seedSource == "oma") {
-                linkText <- paste0(linkText, createDBlink(seedId, "OMA"))
-            }
+            # if (input$seedSource == "ncbi") {
+                if (length(strsplit(seedId, "_")[[1]]) > 3) {
+                    seedIdMod <- paste0("XP_", gsub("^.*_", "", seedId))
+                } else {
+                    seedIdMod <- gsub("^.*_", "", seedId)
+                }
+                linkText <- paste0(linkText, createDBlink(seedIdMod, "NCBI"))
+            # } else if (input$seedSource == "uniprot") {
+            #     linkText <- paste0(linkText, createDBlink(seedId, "UniProt"))
+            # } else if (input$seedSource == "orthodb") {
+            #     linkText <- paste0(linkText, createDBlink(seedId, "OrthoDB", input$orthodbSeedVer))
+            # } else if (input$seedSource == "oma") {
+            #     linkText <- paste0(linkText, createDBlink(seedId, "OMA"))
+            # }
         }
         # get ortho ID
         protId <- toString(info[2])
@@ -3062,15 +3077,15 @@ shinyServer(function(input, output, session) {
             protId <- parseProId(protId, input$separator, input$seqIdFormat)
         }
         if (length(protId) > 0) {
-            if (input$orthoSource == "ncbi") {
+            # if (input$orthoSource == "ncbi") {
                 linkText <- paste0(linkText, createDBlink(protId, "NCBI"))
-            } else if (input$orthoSource == "uniprot") {
-                linkText <- paste0(linkText, createDBlink(protId, "UniProt"))
-            } else if (input$orthoSource == "orthodb") {
-                linkText <- paste0(linkText,createDBlink(protId, "OrthoDB", "gene", input$orthodbOrthoVer))
-            } else if (input$orthoSource == "oma") {
-                linkText <- paste0(linkText, createDBlink(protId, "OMA", "gene"))
-            }
+            # } else if (input$orthoSource == "uniprot") {
+            #     linkText <- paste0(linkText, createDBlink(protId, "UniProt"))
+            # } else if (input$orthoSource == "orthodb") {
+            #     linkText <- paste0(linkText,createDBlink(protId, "OrthoDB", "gene", input$orthodbOrthoVer))
+            # } else if (input$orthoSource == "oma") {
+            #     linkText <- paste0(linkText, createDBlink(protId, "OMA", "gene"))
+            # }
         }
         # get taxon ID
         taxId <- gsub("ncbi", "", info[5])
@@ -3098,53 +3113,54 @@ shinyServer(function(input, output, session) {
 
     # * render FASTA sequence --------------------------------------------------
     output$fasta <- renderText({
-        req(v$doPlot)
+        # req(v$doPlot)
         info <- pointInfoDetail() # info = seedID, orthoID, var1
 
         req(info)
         seqID <- toString(info[2])
 
-        if (input$demoData == "none") {
-            filein <- input$mainInput
-            inputType <- checkInputValidity(filein$datapath)
-            # get fata from oma
-            if (inputType == "oma") {
-                fastaOut <- getSelectedFastaOma(finalOmaDf(), seqID)
-            }
-            # get fasta from main input
-            else if (inputType == "fasta") {
-                seqIDMod <- paste0(info[1], "|", info[5], "|", info[2])
-                fastaOut <- getFastaFromFasInput(
-                    seqIDMod, file = filein$datapath
-                )
-            } else {
+        # if (input$demoData == "none") {
+            # filein <- input$mainInput
+            # inputType <- checkInputValidity(filein$datapath)
+            # # get fata from oma
+            # if (inputType == "oma") {
+            #     fastaOut <- getSelectedFastaOma(finalOmaDf(), seqID)
+            # }
+            # # get fasta from main input
+            # else if (inputType == "fasta") {
+            #     seqIDMod <- paste0(info[1], "|", info[5], "|", info[2])
+            #     fastaOut <- getFastaFromFasInput(
+            #         seqIDMod, file = filein$datapath
+            #     )
+            # } else {
                 # get from concaternated file
                 if (input$inputType == "Concatenated fasta file") {
-                    fastain <- input$concatFasta
-                    fastaOut <- getFastaFromFile(seqID, fastain$datapath)
+                    fastain <- fasta_file #input$concatFasta
+                    # seqID <- sub(".*?_", "", seqID)
+                    fastaOut <- getFastaFromFile(seqID, fasta_file) #fastain$datapath)
                 }
                 # get from folder
-                else {
-                    fastaOut <- getFastaFromFolder(
-                        seqID,
-                        input$path,
-                        input$dirFormat,
-                        input$fileExt,
-                        input$idFormat
-                    )
-                }
-            }
-        } else {
-            if (input$demoData == "preCalcDt") {
-                if (!is.null(i_fastaInput))
-                    if (!file.exists(i_fastaInput))
-                        return("Fasta file not found!")
-                    fastaOut <- getFastaFromFile(seqID, i_fastaInput)
-            } else {
-                # get fasta from demo online data
-                fastaOut <- getFastaDemo(seqID, demoData = input$demoData)
-            }
-        }
+                # else {
+                #     fastaOut <- getFastaFromFolder(
+                #         seqID,
+                #         input$path,
+                #         input$dirFormat,
+                #         input$fileExt,
+                #         input$idFormat
+                #     )
+                # }
+            # }
+        # } else {
+        #     if (input$demoData == "preCalcDt") {
+        #         if (!is.null(i_fastaInput))
+        #             if (!file.exists(i_fastaInput))
+        #                 return("Fasta file not found!")
+        #             fastaOut <- getFastaFromFile(seqID, i_fastaInput)
+        #     } else {
+        #         # get fasta from demo online data
+        #         fastaOut <- getFastaDemo(seqID, demoData = input$demoData)
+        #     }
+        # }
         return(paste(fastaOut[1]))
     })
 

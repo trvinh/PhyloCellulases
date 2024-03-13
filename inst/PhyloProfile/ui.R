@@ -10,7 +10,7 @@ shinyUI(
         useShinyjs(),
 
         # Application title
-        titlePanel("", windowTitle = "PhyloProfile"),
+        titlePanel("", windowTitle = "PhyloProfile Cellulases"),
 
         # TOP WELLPANEL FOR PLOT CONFIGURATION ---------------------------------
         conditionalPanel(
@@ -145,7 +145,7 @@ shinyUI(
 
         # MAIN NARVARPAGE TABS -------------------------------------------------
         navbarPage(
-            em(strong("PhyloProfile v1.18.0")),
+            em(strong("PhyloProfile Cellulase")),
             id = "tabs",
             collapsible = TRUE,
             inverse = TRUE,
@@ -295,19 +295,19 @@ shinyUI(
                 # * 2nd column -------------------------------------------------
                 column(
                     3,
-                    bsAlert("fileExistMsgUI"),
-                    bsAlert("inputMsgUI"),
+                    # bsAlert("fileExistMsgUI"),
+                    # bsAlert("inputMsgUI"),
 
-                    # ** List of new taxa --------------------------------------
-                    conditionalPanel(
-                        condition = "output.unkTaxaStatus == 'unknown' ||
-                        output.unkTaxaStatus == 'ncbi' ||
-                        output.unkTaxaStatus == 'invalid'",
-                        strong(h4("New taxa were found:")),
-                        DT::dataTableOutput("unkTaxaFull"),
-                        br(),
-                        downloadButton("unkTaxa.download", "Download ID list")
-                    ),
+                    # # ** List of new taxa --------------------------------------
+                    # conditionalPanel(
+                    #     condition = "output.unkTaxaStatus == 'unknown' ||
+                    #     output.unkTaxaStatus == 'ncbi' ||
+                    #     output.unkTaxaStatus == 'invalid'",
+                    #     strong(h4("New taxa were found:")),
+                    #     DT::dataTableOutput("unkTaxaFull"),
+                    #     br(),
+                    #     downloadButton("unkTaxa.download", "Download ID list")
+                    # ),
 
                     # ** Other input options -----------------------------------
                     conditionalPanel(
@@ -364,73 +364,73 @@ shinyUI(
                         ),
                         hr(),
 
-                        strong(h4("Sequence source:")),
-                        column(
-                            6,
-                            selectInput(
-                                "seedSource",
-                                label = h5("Seeds:"),
-                                choices = list(
-                                    "NCBI" = "ncbi",
-                                    "UniProt" = "uniprot",
-                                    "OrthoDB" = "orthodb",
-                                    "OMA" = "oma",
-                                    "User-defined" = "user"
-                                ),
-                                selected = "uniprot",
-                                width = 130
-                            ),
-                            conditionalPanel(
-                                condition = "input.seedSource == 'orthodb'",
-                                textInput(
-                                    "orthodbSeedVer",
-                                    h5("OrthoDB version"),
-                                    value = "",
-                                    placeholder = "latest"
-                                ),
-                                bsPopover(
-                                    "orthodbSeedVer",
-                                    "",
-                                    paste(
-                                        "Leave blank for latest version"
-                                    ),
-                                    "bottom"
-                                )
-                            )
-                        ),
-                        column(
-                            6,
-                            selectInput(
-                                "orthoSource",
-                                label = h5("Orthologs:"),
-                                choices = list(
-                                    "NCBI" = "ncbi",
-                                    "UniProt" = "uniprot",
-                                    "OrthoDB" = "orthodb",
-                                    "OMA" = "oma",
-                                    "User-defined" = "user"
-                                ),
-                                selected = "ncbi",
-                                width = 130
-                            ),
-                            conditionalPanel(
-                                condition = "input.orthoSource == 'orthodb'",
-                                textInput(
-                                    "orthodbOrthoVer",
-                                    h5("OrthoDB version"),
-                                    value = "",
-                                    placeholder = "e.g. 10-1"
-                                ),
-                                bsPopover(
-                                    "orthodbOrthoVer",
-                                    "",
-                                    paste(
-                                        "Leave blank for latest version"
-                                    ),
-                                    "bottom"
-                                )
-                            )
-                        ),
+                        # strong(h4("Sequence source:")),
+                        # column(
+                        #     6,
+                        #     selectInput(
+                        #         "seedSource",
+                        #         label = h5("Seeds:"),
+                        #         choices = list(
+                        #             "NCBI" = "ncbi",
+                        #             "UniProt" = "uniprot",
+                        #             "OrthoDB" = "orthodb",
+                        #             "OMA" = "oma",
+                        #             "User-defined" = "user"
+                        #         ),
+                        #         selected = "uniprot",
+                        #         width = 130
+                        #     ),
+                        #     conditionalPanel(
+                        #         condition = "input.seedSource == 'orthodb'",
+                        #         textInput(
+                        #             "orthodbSeedVer",
+                        #             h5("OrthoDB version"),
+                        #             value = "",
+                        #             placeholder = "latest"
+                        #         ),
+                        #         bsPopover(
+                        #             "orthodbSeedVer",
+                        #             "",
+                        #             paste(
+                        #                 "Leave blank for latest version"
+                        #             ),
+                        #             "bottom"
+                        #         )
+                        #     )
+                        # ),
+                        # column(
+                        #     6,
+                        #     selectInput(
+                        #         "orthoSource",
+                        #         label = h5("Orthologs:"),
+                        #         choices = list(
+                        #             "NCBI" = "ncbi",
+                        #             "UniProt" = "uniprot",
+                        #             "OrthoDB" = "orthodb",
+                        #             "OMA" = "oma",
+                        #             "User-defined" = "user"
+                        #         ),
+                        #         selected = "ncbi",
+                        #         width = 130
+                        #     ),
+                        #     conditionalPanel(
+                        #         condition = "input.orthoSource == 'orthodb'",
+                        #         textInput(
+                        #             "orthodbOrthoVer",
+                        #             h5("OrthoDB version"),
+                        #             value = "",
+                        #             placeholder = "e.g. 10-1"
+                        #         ),
+                        #         bsPopover(
+                        #             "orthodbOrthoVer",
+                        #             "",
+                        #             paste(
+                        #                 "Leave blank for latest version"
+                        #             ),
+                        #             "bottom"
+                        #         )
+                        #     )
+                        # ),
                         actionButton(
                             "selectSequenceID", "Ortholog ID format",
                             style = "padding:4px; font-size:100%"
