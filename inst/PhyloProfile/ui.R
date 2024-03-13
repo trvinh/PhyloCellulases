@@ -48,16 +48,16 @@ shinyUI(
                     ),
                     column(
                         1,
-                        createPlotSize("width", "Width (px)", 600),
+                        createPlotSize("width", "Width (px)", 6000),
                         checkboxInput(
                             "autoSizing",
                             strong(em("Auto sizing")),
-                            value = TRUE,
+                            value = FALSE,
                             width = NULL
                         )
                     ),
                     column(
-                        1, createPlotSize("height", "Height (px)", 600),
+                        1, createPlotSize("height", "Height (px)", 3000),
                         actionButton("mainPlotConfig", "Appearance")
                     ),
                     column(
@@ -108,16 +108,16 @@ shinyUI(
                     ),
                     column(
                         1,
-                        createPlotSize("selectedWidth", "Width (px)", 600),
+                        createPlotSize("selectedWidth", "Width (px)", 6000),
                         checkboxInput(
                             "selectedAutoSizing",
                             strong(em("Auto sizing")),
-                            value = TRUE,
+                            value = FALSE,
                             width = NULL
                         )
                     ),
                     column(
-                        1, createPlotSize("selectedHeight", "Height (px)", 600),
+                        1, createPlotSize("selectedHeight", "Height (px)", 3000),
                         actionButton("selectedPlotConfig", "Appearance")
                     ),
                     column(
@@ -445,12 +445,12 @@ shinyUI(
                         ),
                         hr(),
                         
-                        strong(h4("Color configuration:")),
-                        actionButton(
-                            "setColor", "Change colors",
-                            style = "padding:4px; font-size:100%"
-                        ),
-                        hr(),
+                        # strong(h4("Color configuration:")),
+                        # actionButton(
+                        #     "setColor", "Change colors",
+                        #     style = "padding:4px; font-size:100%"
+                        # ),
+                        # hr(),
 
                         strong(h4("Other optional input:")),
 
@@ -474,16 +474,16 @@ shinyUI(
                         selected = "Default",
                         inline = TRUE
                     ),
-                    conditionalPanel(
-                        condition = "input.taxDbLoc == 'User-defined'",
-                        shinyDirButton(
-                            "taxDbDir", "Select taxonomy DB" ,
-                            title = "Please select a folder",
-                            buttonType = "default", class = NULL
-                        ),
-                        br(), br(),
-                        uiOutput("userTaxDBwarning")
-                    ),
+                    # conditionalPanel(
+                    #     condition = "input.taxDbLoc == 'User-defined'",
+                    #     shinyDirButton(
+                    #         "taxDbDir", "Select taxonomy DB" ,
+                    #         title = "Please select a folder",
+                    #         buttonType = "default", class = NULL
+                    #     ),
+                    #     br(), br(),
+                    #     uiOutput("userTaxDBwarning")
+                    # ),
                     verbatimTextOutput("taxDbPath"),
                     hr(),
         
@@ -746,9 +746,44 @@ shinyUI(
                         column(
                             12,
                             style = "padding:0px;",
+                            strong(
+                                "Select (super)taxon/(super)taxa of interest:"
+                            )
+                        ),
+                        column(
+                            12,
+                            style = "padding:0px;",
+                            uiOutput("cusRankSelect.ui"),
+                            # selectTaxonRankUI("selectTaxonRank")
+                        ),
+                        column(
+                            12,
+                            style = "padding:0px;",
+                            uiOutput("cusSelectTaxonRank.ui"),
+                        ),
+                        column(
+                            12,
+                            style = "padding:0px;",
+                            uiOutput("cusTaxa.ui")
+                            # fluidRow(
+                            #     column(
+                            #         8,
+                            #         style = "padding:0px;",
+                            #         uiOutput("cusTaxa.ui")
+                            #     ),
+                            #     column(
+                            #         4,
+                            #         h3(""),
+                            #         bsButton("cusTaxa", "Browse...")
+                            #     )
+                            # )
+                        ),
+                        column(
+                            12,
+                            style = "padding:0px;",
                             strong("Select sequence(s) of interest:")
                         ),
-
+                        
                         column(
                             12,
                             fluidRow(
@@ -763,29 +798,7 @@ shinyUI(
                                 )
                             )
                         ),
-
-                        column(
-                            12,
-                            style = "padding:0px;",
-                            strong(
-                                "Select (super)taxon/(super)taxa of interest:"
-                            )
-                        ),
-                        column(
-                            12,
-                            fluidRow(
-                                column(
-                                    8,
-                                    style = "padding:0px;",
-                                    uiOutput("cusTaxa.ui")
-                                ),
-                                column(
-                                    4,
-                                    h3(""),
-                                    bsButton("cusTaxa", "Browse...")
-                                )
-                            )
-                        ),
+                        
                         uiOutput("cusSuperRankSelect.ui"),
 
                         h5(""),
@@ -1186,59 +1199,59 @@ shinyUI(
                             hr(),
                             verbatimTextOutput("resetTaxonomyDataStatus")
                         ),
-                        conditionalPanel(
-                            condition =
-                                "input.taxDB=='export'",
-                            h4(strong("Export current taxonomy files")),
-                            uiOutput("taxExportWarning.ui"),
-                            br(),
-                            shinyDirButton(
-                                "taxDirOut", 
-                                "Select output directory" ,
-                                title = paste(
-                                    "Please select output directory"
-                                ),
-                                buttonType = "default", class = NULL
-                            ),
-                            br(),
-                            uiOutput("taxDirOut.ui"),
-                            br(),
-                            bsButton(
-                                "doExportTax",
-                                "Do export",
-                                style = "warning",
-                                icon("file-export")
-                            ),
-                            hr(),
-                            verbatimTextOutput("exportTaxonomyDataStatus")
-                        ),
-                        conditionalPanel(
-                            condition =
-                                "input.taxDB=='import'",
-                            h4(strong("Import your own taxonomy files")),
-                            uiOutput("taxImportWarning.ui"),
-                            br(),
-                            shinyDirButton(
-                                "taxDir", 
-                                "Select input directory" ,
-                                title = paste(
-                                    "Please select directory that contains 
-                                    the taxonomy files"
-                                ),
-                                buttonType = "default", class = NULL
-                            ),
-                            br(),
-                            uiOutput("taxDir.ui"),
-                            br(),
-                            bsButton(
-                                "doImportTax",
-                                "Do import",
-                                style = "warning",
-                                icon("file-import")
-                            ),
-                            hr(),
-                            verbatimTextOutput("importTaxonomyDataStatus")
-                        )
+                        # conditionalPanel(
+                        #     condition =
+                        #         "input.taxDB=='export'",
+                        #     h4(strong("Export current taxonomy files")),
+                        #     uiOutput("taxExportWarning.ui"),
+                        #     br(),
+                        #     shinyDirButton(
+                        #         "taxDirOut", 
+                        #         "Select output directory" ,
+                        #         title = paste(
+                        #             "Please select output directory"
+                        #         ),
+                        #         buttonType = "default", class = NULL
+                        #     ),
+                        #     br(),
+                        #     uiOutput("taxDirOut.ui"),
+                        #     br(),
+                        #     bsButton(
+                        #         "doExportTax",
+                        #         "Do export",
+                        #         style = "warning",
+                        #         icon("file-export")
+                        #     ),
+                        #     hr(),
+                        #     verbatimTextOutput("exportTaxonomyDataStatus")
+                        # ),
+                        # conditionalPanel(
+                        #     condition =
+                        #         "input.taxDB=='import'",
+                        #     h4(strong("Import your own taxonomy files")),
+                        #     uiOutput("taxImportWarning.ui"),
+                        #     br(),
+                        #     shinyDirButton(
+                        #         "taxDir", 
+                        #         "Select input directory" ,
+                        #         title = paste(
+                        #             "Please select directory that contains 
+                        #             the taxonomy files"
+                        #         ),
+                        #         buttonType = "default", class = NULL
+                        #     ),
+                        #     br(),
+                        #     uiOutput("taxDir.ui"),
+                        #     br(),
+                        #     bsButton(
+                        #         "doImportTax",
+                        #         "Do import",
+                        #         style = "warning",
+                        #         icon("file-import")
+                        #     ),
+                        #     hr(),
+                        #     verbatimTextOutput("importTaxonomyDataStatus")
+                        # )
                     )
                 )
             ),
@@ -1251,43 +1264,43 @@ shinyUI(
                 downloadFilteredCustomizedUI("filteredCustomizedDownload"),
                 
                 # * Export plot settings ---------------------------------------
-                tabPanel(
-                    "Export plot settings",
-                    h4(strong("Export plot settings")),
-                    bsAlert("descExportSettingUI"),
-                    radioButtons(
-                        inputId = "exportSetting",
-                        label = "as:",
-                        choices = list(
-                            "a list" = "list",
-                            "an Rscript" = "rscript"
-                        )
-                    ),
-                    hr(),
-                    strong("Output dir:"),
-                    br(), br(),
-                    shinyDirButton(
-                        "settingDir", 
-                        "Select output directory" ,
-                        title = paste(
-                            "Please select output directory"
-                        ),
-                        buttonType = "default", class = NULL
-                    ),
-                    br(), br(),
-                    strong("File name:"),
-                    uiOutput("settingFile.ui"),
-                    uiOutput("settingDir.ui"),
-                    br(),
-                    bsButton(
-                        "doExportSetting",
-                        "Do export",
-                        style = "warning",
-                        icon("file-export")
-                    ),
-                    hr(),
-                    verbatimTextOutput("exportSettingStatus")
-                )
+                # tabPanel(
+                #     "Export plot settings",
+                #     h4(strong("Export plot settings")),
+                #     bsAlert("descExportSettingUI"),
+                #     radioButtons(
+                #         inputId = "exportSetting",
+                #         label = "as:",
+                #         choices = list(
+                #             "a list" = "list",
+                #             "an Rscript" = "rscript"
+                #         )
+                #     ),
+                #     hr(),
+                #     strong("Output dir:"),
+                #     br(), br(),
+                #     shinyDirButton(
+                #         "settingDir", 
+                #         "Select output directory" ,
+                #         title = paste(
+                #             "Please select output directory"
+                #         ),
+                #         buttonType = "default", class = NULL
+                #     ),
+                #     br(), br(),
+                #     strong("File name:"),
+                #     uiOutput("settingFile.ui"),
+                #     uiOutput("settingDir.ui"),
+                #     br(),
+                #     bsButton(
+                #         "doExportSetting",
+                #         "Do export",
+                #         style = "warning",
+                #         icon("file-export")
+                #     ),
+                #     hr(),
+                #     verbatimTextOutput("exportSettingStatus")
+                # )
             ),
 
             # HELP TAB =========================================================
@@ -1498,82 +1511,6 @@ shinyUI(
             createArchitecturePlotUI("archiPlotMain")
         ),
 
-        # * popup for setting plot colors (profiles) ---------------------------
-        bsModal(
-            "color",
-            "Set colors for profile",
-            "setColor",
-            size = "small",
-            colourpicker::colourInput(
-                "lowColorVar1",
-                "Low variable 1 (dot)",
-                value = "#FF8C00"
-            ),
-            colourpicker::colourInput(
-                "midColorVar1",
-                "Mid variable 1 (dot)",
-                value = "#40ABCF"
-            ),
-            colourpicker::colourInput(
-                "highColorVar1",
-                "High variable 1 (dot)",
-                value = "#164294"
-            ),
-            numericInput(
-                "midVar1",
-                "Mitpoint varriable 1",
-                min = 0,
-                max = 1,
-                step = 0.01,
-                value = 0.5
-            ),
-            actionButton(
-                "defaultColorVar1",
-                "Default",
-                style = "padding:4px; font-size:100%"
-            ),
-            hr(),
-            colourpicker::colourInput(
-                "lowColorVar2",
-                "Low variable 2 (background)",
-                value = "#CC8D8D"
-            ),
-            colourpicker::colourInput(
-                "midColorVar2",
-                "Mid variable 2 (background)",
-                value = "#FFFFFF"
-            ),
-            colourpicker::colourInput(
-                "highColorVar2",
-                "High variable 2 (background)",
-                value = "#616587"
-            ),
-            numericInput(
-                "midVar2",
-                "Mitpoint varriable 2",
-                min = 0,
-                max = 1,
-                step = 0.01,
-                value = 1
-            ),
-            actionButton(
-                "defaultColorVar2",
-                "Default",
-                style = "padding:4px; font-size:100%"
-            ),
-            hr(),
-            colourpicker::colourInput(
-                "paraColor",
-                "Color for inparalogs",
-                value = "#07d000"
-            ),
-            actionButton(
-                "defaultColorPara",
-                "Default",
-                style = "padding:4px; font-size:100%"
-            )
-        ),
-
         # * popup for FASTA upload ---------------------------------------------
         bsModal(
             "fastaUploadBs",
@@ -1748,9 +1685,90 @@ shinyUI(
                 br()
             ),
             br(),
+            strong(h4("Color configuration:")),
+            actionButton(
+                "setColor", "Change colors",
+                style = "padding:4px; font-size:100%"
+            ),
             hr(),
             bsButton("resetMainConfig", "Reset", style = "danger"),
             bsButton("applyMainConfig", "Done", style = "warning")
+        ),
+        
+        # * popup for setting plot colors (profiles) ---------------------------
+        bsModal(
+            "color",
+            "Set colors for profile",
+            "setColor",
+            size = "small",
+            colourpicker::colourInput(
+                "lowColorVar1",
+                "Low variable 1 (dot)",
+                value = "#FF8C00"
+            ),
+            colourpicker::colourInput(
+                "midColorVar1",
+                "Mid variable 1 (dot)",
+                value = "#40ABCF"
+            ),
+            colourpicker::colourInput(
+                "highColorVar1",
+                "High variable 1 (dot)",
+                value = "#164294"
+            ),
+            numericInput(
+                "midVar1",
+                "Mitpoint varriable 1",
+                min = 0,
+                max = 1,
+                step = 0.01,
+                value = 0.5
+            ),
+            actionButton(
+                "defaultColorVar1",
+                "Default",
+                style = "padding:4px; font-size:100%"
+            ),
+            hr(),
+            colourpicker::colourInput(
+                "lowColorVar2",
+                "Low variable 2 (background)",
+                value = "#CC8D8D"
+            ),
+            colourpicker::colourInput(
+                "midColorVar2",
+                "Mid variable 2 (background)",
+                value = "#FFFFFF"
+            ),
+            colourpicker::colourInput(
+                "highColorVar2",
+                "High variable 2 (background)",
+                value = "#616587"
+            ),
+            numericInput(
+                "midVar2",
+                "Mitpoint varriable 2",
+                min = 0,
+                max = 1,
+                step = 0.01,
+                value = 1
+            ),
+            actionButton(
+                "defaultColorVar2",
+                "Default",
+                style = "padding:4px; font-size:100%"
+            ),
+            hr(),
+            colourpicker::colourInput(
+                "paraColor",
+                "Color for inparalogs",
+                value = "#07d000"
+            ),
+            actionButton(
+                "defaultColorPara",
+                "Default",
+                style = "padding:4px; font-size:100%"
+            )
         ),
 
         # * popup for setting Customized plot configurations -------------------
@@ -2021,19 +2039,19 @@ shinyUI(
         ),
 
         # * popup for select taxa on Customized Profile ------------------------
-        bsModal(
-            "cusTaxaBs",
-            "Select taxon/taxa of interest",
-            "cusTaxa",
-            size = "small",
-            selectTaxonRankUI("selectTaxonRank"),
-            checkboxInput(
-                "applyCusTaxa",
-                strong("Apply to customized profile",
-                       style = "color:red"),
-                value = FALSE
-            )
-        ),
+        # bsModal(
+        #     "cusTaxaBs",
+        #     "Select taxon/taxa of interest",
+        #     "cusTaxa",
+        #     size = "small",
+        #     selectTaxonRankUI("selectTaxonRank"),
+        #     checkboxInput(
+        #         "applyCusTaxa",
+        #         strong("Apply to customized profile",
+        #                style = "color:red"),
+        #         value = FALSE
+        #     )
+        # ),
 
         # * popup for select taxa on Core gene finding -------------------------
         bsModal(

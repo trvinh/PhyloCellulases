@@ -1,8 +1,8 @@
 # PhyloCellulase
 
-This is a lite version of [PhyloProfile](https://github.com/BIONF/PhyloProfile), which is pre-configured only for its use with the data of 303 [eukaryotic ribosome biogenesis factors](https://applbio.biologie.uni-frankfurt.de/download/RibosomeBiogenesis/PhyloRBF/). The phylogenetic profiles for proteins in the RBFeuk set across 982 taxa provide the first unifying resource for tracing eukaryotic ribosome biogenesis factors across the organismal diversity.
+This is a lite version of [PhyloProfile](https://github.com/BIONF/PhyloProfile), which is pre-configured only for its use with the data of ~~303 [eukaryotic ribosome biogenesis factors](https://applbio.biologie.uni-frankfurt.de/download/RibosomeBiogenesis/PhyloRBF/)~~. The phylogenetic profiles for proteins in the ~~RBFeuk set across 982 taxa provide the first unifying resource for tracing eukaryotic ribosome biogenesis factors across the organismal diversity~~.
 
-Users can display the full data set, customized subsets of RBFs and taxa, zoom in on individual ortholog pairs, and ultimately display the domain architectures of the yeast or human RBF and of its ortholog. Interactive links connect the information about taxon, protein sequence and Pfam (El-Gebali, et al. 2019) or SMART domains (Letunic, et al. 2009) with the corresponding public databases.
+Users can display the full data set, customized subsets of cellulases and taxa, zoom in on individual ortholog pairs, and ultimately display the domain architectures of the orthologous cellulases. Interactive links connect the information about taxon, protein sequence and Pfam (El-Gebali, et al. 2019) or SMART domains (Letunic, et al. 2009) with the corresponding public databases.
 
 # Table of Contents
 * [Usage](#usage)

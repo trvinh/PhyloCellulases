@@ -159,7 +159,7 @@ createArchitecturePlot <- function(
     #     if (is.null(input$archiClick$y)) return("No domain selected!")
     #     y <- input$archiClick$y
     #     # paste(y, round(y), convertY(unit(y, "npc"), "px"))
-    #     
+    # 
     # })
     
     output$featureList.ui <- renderUI({
@@ -171,7 +171,7 @@ createArchitecturePlot <- function(
             options=list(placeholder = 'None')
         )
     })
-    
+
     output$domainTable <- renderTable({
         if (is.null(nrow(filterDomainDf()))) return("No domain info available!")
         features <- getDomainLink(pointInfo(), filterDomainDf(), getSeqIdFormat())
