@@ -48,13 +48,14 @@ shinyUI(
                     ),
                     column(
                         1,
-                        createPlotSize("width", "Width (px)", 6000),
-                        checkboxInput(
-                            "autoSizing",
-                            strong(em("Auto sizing")),
-                            value = FALSE,
-                            width = NULL
-                        )
+                        createPlotSize("width", "Width (px)", 6000)
+                        # ,
+                        # checkboxInput(
+                        #     "autoSizing",
+                        #     strong(em("Auto sizing")),
+                        #     value = FALSE,
+                        #     width = NULL
+                        # )
                     ),
                     column(
                         1, createPlotSize("height", "Height (px)", 3000),
@@ -153,490 +154,490 @@ shinyUI(
             position = "fixed-top",
 
             # INPUT TAB --------------------------------------------------------
-            tabPanel(
-                "Input & settings",
-                # * 1st column -------------------------------------------------
-                column(
-                    4,
-                    # ** Main input --------------------------------------------
-                    strong(h4("Main input:")),
-                    conditionalPanel(
-                        condition = "input.do",
-                        em(
-                            strong(
-                                "RELOAD THIS TOOL TO UPLOAD A NEW INPUT
-                                FILE!!!", style = "color:red"
-                            )
-                        )
-                    ),
-
-                    selectInput(
-                        "demoData", label = h5("Use online demo data:"),
-                        choices = list(
-                            "None" = "none",
-                            "AMPK-TOR" = "ampk-tor",
-                            "BUSCO Arthropoda" = "arthropoda"
-                        ),
-                        selected = "none",
-                        width = "80%"
-                    ),
-
-                    uiOutput("noInternetMsg"),
-                    uiOutput("demoDataDescribe"),
-                    uiOutput("mainInputFile.ui"),
-                    uiOutput("inputCheck.ui"),
-
-                    fluidRow(
-                        column(
-                            6,
-                            conditionalPanel(
-                                condition = "output.checkOmaInput",
-                                bsButton("openOmaWindows", "Get data from OMA"),
-                                br()
-                            )
-                        )
-                    ),
-
-                    # ** Variable 1 --------------------------------------------
-                    fluidRow(
-                        column(
-                            4, uiOutput("var1ID.ui")
-                        ),
-                        column(
-                            4,
-                            selectInput(
-                                "var1AggregateBy",
-                                label = h5("Aggregate by:"),
-                                choices = list(
-                                    "Max" = "max",
-                                    "Min" = "min",
-                                    "Mean" = "mean",
-                                    "Median" = "median"
-                                ),
-                                selected = "max",
-                                width = 130
-                            )
-                        ),
-                        column(
-                            4,
-                            selectInput(
-                                "var1Relation", label = h5("Relationship:"),
-                                choices = list(
-                                    "Prot-Prot" = "protein",
-                                    "Prot-Spec" = "species"
-                                ),
-                                selected = "protein",
-                                width = 130
-                            ),
-                            bsPopover(
-                                "var1Relation",
-                                "",
-                                paste(
-                                    "select if variable is the value between ",
-                                    "seed protein - ortholog protein",
-                                    " or seed protein - search taxon",
-                                    sep = "<br>"
-                                ),
-                                "bottom"
-                            )
-                        )
-                    ),
-
-                    # ** Variable 2 --------------------------------------------
-                    fluidRow(
-                        column(
-                            4, uiOutput("var2ID.ui")
-                        ),
-                        column(
-                            4,
-                            selectInput(
-                                "var2AggregateBy",
-                                label = h5("Aggregate by:"),
-                                choices = list(
-                                    "Max" = "max",
-                                    "Min" = "min",
-                                    "Mean" = "mean",
-                                    "Median" = "median"
-                                ),
-                                selected = "max",
-                                width = 130
-                            )
-                        ),
-                        column(
-                            4,
-                            selectInput(
-                                "var2Relation", label = h5("Relationship:"),
-                                choices = list(
-                                    "Prot-Prot" = "protein", 
-                                    "Prot-Spec" = "species"
-                                ),
-                                selected = "protein",
-                                width = 130
-                            )
-                        )
-                    ),
-                    hr(),
-
-                    # ** Domain input ------------------------------------------
-                    strong(h4("Additional annotation input:")),
-                    radioButtons(
-                        inputId = "annoLocation", label = "",
-                        choices = list("from file", "from folder"),
-                        selected = "from file",
-                        inline = TRUE
-                    ),
-
-                    uiOutput("domainInputFile.ui"),
-
-                    hr(),
-                    uiOutput("downloadDemo.ui")
-                ),
-
-                # * 2nd column -------------------------------------------------
-                column(
-                    3,
-                    # bsAlert("fileExistMsgUI"),
-                    # bsAlert("inputMsgUI"),
-
-                    # # ** List of new taxa --------------------------------------
-                    # conditionalPanel(
-                    #     condition = "output.unkTaxaStatus == 'unknown' ||
-                    #     output.unkTaxaStatus == 'ncbi' ||
-                    #     output.unkTaxaStatus == 'invalid'",
-                    #     strong(h4("New taxa were found:")),
-                    #     DT::dataTableOutput("unkTaxaFull"),
-                    #     br(),
-                    #     downloadButton("unkTaxa.download", "Download ID list")
-                    # ),
-
-                    # ** Other input options -----------------------------------
-                    conditionalPanel(
-                        condition = "output.unkTaxaStatus == 0",
-                        strong(h4("Choose genes of interest:")),
-                        radioButtons(
-                            inputId = "geneListSelected",
-                            label = "",
-                            choices = list("all", "from file"),
-                            selected = "all",
-                            inline = TRUE
-                        ),
-
-                        conditionalPanel(
-                            condition = "input.geneListSelected == 'from file'",
-                            fileInput("geneList", "")
-                        ),
-                        uiOutput("totalGeneNumber.ui"),
-                        column(
-                            6,
-                            numericInput(
-                                "stIndex",
-                                h5("Show from:"),
-                                min = 1,
-                                max = 1600,
-                                value = 1,
-                                width = 130
-                            )
-                        ),
-                        
-                        column(
-                            6,
-                            numericInput(
-                                "endIndex",
-                                h5("...to:"),
-                                min = 1,
-                                max = 1600,
-                                value = 1000,
-                                width = 130
-                            )
-                        ),
-                        bsPopover(
-                            "stIndex",
-                            "",
-                            "Set start index for sequence range",
-                            "bottom"
-                        ),
-                        
-                        bsPopover(
-                            "endIndex",
-                            "",
-                            "Set end index for sequence range",
-                            "bottom"
-                        ),
-                        hr(),
-
-                        # strong(h4("Sequence source:")),
-                        # column(
-                        #     6,
-                        #     selectInput(
-                        #         "seedSource",
-                        #         label = h5("Seeds:"),
-                        #         choices = list(
-                        #             "NCBI" = "ncbi",
-                        #             "UniProt" = "uniprot",
-                        #             "OrthoDB" = "orthodb",
-                        #             "OMA" = "oma",
-                        #             "User-defined" = "user"
-                        #         ),
-                        #         selected = "uniprot",
-                        #         width = 130
-                        #     ),
-                        #     conditionalPanel(
-                        #         condition = "input.seedSource == 'orthodb'",
-                        #         textInput(
-                        #             "orthodbSeedVer",
-                        #             h5("OrthoDB version"),
-                        #             value = "",
-                        #             placeholder = "latest"
-                        #         ),
-                        #         bsPopover(
-                        #             "orthodbSeedVer",
-                        #             "",
-                        #             paste(
-                        #                 "Leave blank for latest version"
-                        #             ),
-                        #             "bottom"
-                        #         )
-                        #     )
-                        # ),
-                        # column(
-                        #     6,
-                        #     selectInput(
-                        #         "orthoSource",
-                        #         label = h5("Orthologs:"),
-                        #         choices = list(
-                        #             "NCBI" = "ncbi",
-                        #             "UniProt" = "uniprot",
-                        #             "OrthoDB" = "orthodb",
-                        #             "OMA" = "oma",
-                        #             "User-defined" = "user"
-                        #         ),
-                        #         selected = "ncbi",
-                        #         width = 130
-                        #     ),
-                        #     conditionalPanel(
-                        #         condition = "input.orthoSource == 'orthodb'",
-                        #         textInput(
-                        #             "orthodbOrthoVer",
-                        #             h5("OrthoDB version"),
-                        #             value = "",
-                        #             placeholder = "e.g. 10-1"
-                        #         ),
-                        #         bsPopover(
-                        #             "orthodbOrthoVer",
-                        #             "",
-                        #             paste(
-                        #                 "Leave blank for latest version"
-                        #             ),
-                        #             "bottom"
-                        #         )
-                        #     )
-                        # ),
-                        actionButton(
-                            "selectSequenceID", "Ortholog ID format",
-                            style = "padding:4px; font-size:100%"
-                        ),
-                        h5(""),
-                        hr(),
-                        
-                        checkboxInput(
-                            "ordering",
-                            strong("Order seed IDs"),
-                            value = TRUE
-                        ),
-                        hr(),
-                        
-                        # strong(h4("Color configuration:")),
-                        # actionButton(
-                        #     "setColor", "Change colors",
-                        #     style = "padding:4px; font-size:100%"
-                        # ),
-                        # hr(),
-
-                        strong(h4("Other optional input:")),
-
-                        bsButton("fastaUpload", "FASTA file(s)"),
-                        h5(""),
-
-                        bsButton("uploadGeneCategory", "Gene categories"),
-                        h5(""),
-                        hr()
-                    )
-                ),
-
-                # * 3rd column -------------------------------------------------
-                column(
-                    4,
-                    # ** Location for taxonomy files ---------------------------
-                    strong(h4("Taxonomy DB location:")),
-                    radioButtons(
-                        inputId = "taxDbLoc", label = "",
-                        choices = list("Default", "User-defined"),
-                        selected = "Default",
-                        inline = TRUE
-                    ),
-                    # conditionalPanel(
-                    #     condition = "input.taxDbLoc == 'User-defined'",
-                    #     shinyDirButton(
-                    #         "taxDbDir", "Select taxonomy DB" ,
-                    #         title = "Please select a folder",
-                    #         buttonType = "default", class = NULL
-                    #     ),
-                    #     br(), br(),
-                    #     uiOutput("userTaxDBwarning")
-                    # ),
-                    verbatimTextOutput("taxDbPath"),
-                    hr(),
-        
-                    # ** Msg for parsing new taxa ------------------------------
-                    conditionalPanel(
-                        condition = "output.unkTaxaStatus == 'unknown' ||
-                        output.unkTaxaStatus == 'ncbi' ||
-                        output.unkTaxaStatus == 'invalid'",
-
-                        conditionalPanel(
-                            condition = "output.unkTaxaStatus == 'invalid'",
-                            HTML(
-                                "<p><em>Some new taxa have
-                                <span style=\"color: #ff0000;\">invalid IDs
-                                </span> (either in newTaxa.txt or in the main
-                                profile input or both). IDs of non-NCBI taxa
-                                have to be greater than 999999005.</em></p>
-                                <p><em>Please replace those IDs before
-                                continuing!</em></p>"
-                            )
-                        ),
-
-                        conditionalPanel(
-                            condition = "output.unkTaxaStatus == 'unknown'",
-                            HTML(
-                                '<p><em>NCBI taxonomy information of some taxa
-                                can neither</em></p><ul><li><em>be retrieved
-                                from NCBI (<span style="color: #0000ff;
-                                ">Source="ncbi"</span>) nor </em></li>
-                                <li><em>be found in
-                                <span style="color: #ff0000;">
-                                PhyloProfile/data/newTaxa.txt</span>&nbsp;(<span
-                                style="color: #0000ff;">Source="new"</span>)
-                                file</em></li></ul><p><strong><em>Please add
-                                taxonomy information for those unknown taxa and
-                                <span style="color: #ff0000;"> reload the tool
-                                </span> to continue!</em></strong></p>'
-                            ),
-                            h5(""),
-                            bsButton(
-                                "addTaxa",
-                                "Add taxonomy info",
-                                disabled = FALSE,
-                                style = "warning"
-                            )
-                        ),
-
-                        conditionalPanel(
-                            condition = "output.unkTaxaStatus == 'ncbi'",
-                            HTML(
-                                '<p><em>NCBI taxonomy information of some taxa
-                                can either</em></p><ul><li><em>be retrieved
-                                from NCBI (<span style="color: #0000ff;
-                                ">Source="ncbi"</span>) or </em></li>
-                                <li><em>be found in
-                                <span style="color: #ff0000;">
-                                PhyloProfile/data/newTaxa.txt</span>&nbsp;(<span
-                                style="color: #0000ff;">Source="new"</span>)
-                                file</em></li></ul><p><strong><em>Click here to
-                                get required taxonomy information for those
-                                taxa!</em></strong></p>'
-                            ),
-                            h5(""),
-                            bsButton(
-                                "butParse",
-                                "Get taxonomy info",
-                                disabled = FALSE,
-                                style = "warning"
-                            ),
-
-                            hr(),
-                            uiOutput("endParsingMsg"),
-                            tableOutput("invalidID.output"),
-                            hr(),
-                            conditionalPanel(
-                                condition = "output.unkTaxaStatus
-                                            == 'invalid'",
-                                downloadButton(
-                                    "invalidID.download", "Download invalid IDs"
-                                )
-                            )
-                        )
-                    ),
-
-                    # ** List of ranks & available taxa ------------------------
-                    conditionalPanel(
-                        condition = "output.unkTaxaStatus == 0",
-                        strong(h4("Seed (super)taxon:")),
-                        br(),
-
-                        # strong(h5("Select taxonomy rank:")),
-                        # uiOutput("rankSelect"),
-                        # br(),
-
-                        strong(h5("Choose (super)taxon of interest:")),
-                        selectizeInput(
-                            "inSelect", "", choices = NULL, selected = NULL
-                        ),
-
-                        hr(),
-                        strong(h4("Order taxa")),
-                        radioButtons(
-                            inputId = "orderTaxa",
-                            label = "",
-                            choices = list(
-                                "automatically", "by user defined tree",
-                                "by a sorted list"
-                            ),
-                            selected = "automatically",
-                            inline = TRUE
-                        ),
-                        conditionalPanel(
-                            condition = "input.orderTaxa
-                                        == 'by user defined tree'",
-                            uiOutput("inputTree.ui"),
-                            bsPopover(
-                                "orderTaxa", "", "in newick format", "bottom"
-                            ),
-                            uiOutput("checkNewick.ui")
-                        ),
-                        conditionalPanel(
-                            condition = "input.orderTaxa
-                                        == 'by a sorted list'",
-                            uiOutput("inputSortedTaxa.ui"),
-                            uiOutput("checkSortedTaxa.ui")
-                        ),
-                        
-                        checkboxInput(
-                            "showAllTaxa",
-                            strong("Display all input taxa"),
-                            value = FALSE,
-                            width = NULL
-                        ),
-                        bsPopover(
-                            "showAllTaxa",
-                            "",
-                            "Including taxa with no orthologs",
-                            "bottom"
-                        ), 
-                        hr(),
-
-                        bsButton(
-                            "do",
-                            "PLOT",
-                            type = "action",
-                            style = "danger",
-                            size = "large",
-                            disabled = FALSE
-                        ),
-                        h5("")
-                    )
-                )
-            ),
+            # tabPanel(
+            #     "Input & settings",
+            #     # * 1st column -------------------------------------------------
+            #     # column(
+            #     #     4,
+            #     #     # ** Main input --------------------------------------------
+            #     #     # strong(h4("Main input:")),
+            #     #     # conditionalPanel(
+            #     #     #     condition = "input.do",
+            #     #     #     em(
+            #     #     #         strong(
+            #     #     #             "RELOAD THIS TOOL TO UPLOAD A NEW INPUT
+            #     #     #             FILE!!!", style = "color:red"
+            #     #     #         )
+            #     #     #     )
+            #     #     # ),
+            #     #     # 
+            #     #     # selectInput(
+            #     #     #     "demoData", label = h5("Use online demo data:"),
+            #     #     #     choices = list(
+            #     #     #         "None" = "none",
+            #     #     #         "AMPK-TOR" = "ampk-tor",
+            #     #     #         "BUSCO Arthropoda" = "arthropoda"
+            #     #     #     ),
+            #     #     #     selected = "none",
+            #     #     #     width = "80%"
+            #     #     # ),
+            #     #     # 
+            #     #     # uiOutput("noInternetMsg"),
+            #     #     # uiOutput("demoDataDescribe"),
+            #     #     # uiOutput("mainInputFile.ui"),
+            #     #     # uiOutput("inputCheck.ui"),
+            #     #     # 
+            #     #     # fluidRow(
+            #     #     #     column(
+            #     #     #         6,
+            #     #     #         conditionalPanel(
+            #     #     #             condition = "output.checkOmaInput",
+            #     #     #             bsButton("openOmaWindows", "Get data from OMA"),
+            #     #     #             br()
+            #     #     #         )
+            #     #     #     )
+            #     #     # ),
+            #     # 
+            #     #     # # ** Variable 1 --------------------------------------------
+            #     #     # fluidRow(
+            #     #     #     column(
+            #     #     #         4, uiOutput("var1ID.ui")
+            #     #     #     ),
+            #     #     #     column(
+            #     #     #         4,
+            #     #     #         selectInput(
+            #     #     #             "var1AggregateBy",
+            #     #     #             label = h5("Aggregate by:"),
+            #     #     #             choices = list(
+            #     #     #                 "Max" = "max",
+            #     #     #                 "Min" = "min",
+            #     #     #                 "Mean" = "mean",
+            #     #     #                 "Median" = "median"
+            #     #     #             ),
+            #     #     #             selected = "max",
+            #     #     #             width = 130
+            #     #     #         )
+            #     #     #     ),
+            #     #     #     column(
+            #     #     #         4,
+            #     #     #         selectInput(
+            #     #     #             "var1Relation", label = h5("Relationship:"),
+            #     #     #             choices = list(
+            #     #     #                 "Prot-Prot" = "protein",
+            #     #     #                 "Prot-Spec" = "species"
+            #     #     #             ),
+            #     #     #             selected = "protein",
+            #     #     #             width = 130
+            #     #     #         ),
+            #     #     #         bsPopover(
+            #     #     #             "var1Relation",
+            #     #     #             "",
+            #     #     #             paste(
+            #     #     #                 "select if variable is the value between ",
+            #     #     #                 "seed protein - ortholog protein",
+            #     #     #                 " or seed protein - search taxon",
+            #     #     #                 sep = "<br>"
+            #     #     #             ),
+            #     #     #             "bottom"
+            #     #     #         )
+            #     #     #     )
+            #     #     # ),
+            #     #     # 
+            #     #     # # ** Variable 2 --------------------------------------------
+            #     #     # fluidRow(
+            #     #     #     column(
+            #     #     #         4, uiOutput("var2ID.ui")
+            #     #     #     ),
+            #     #     #     column(
+            #     #     #         4,
+            #     #     #         selectInput(
+            #     #     #             "var2AggregateBy",
+            #     #     #             label = h5("Aggregate by:"),
+            #     #     #             choices = list(
+            #     #     #                 "Max" = "max",
+            #     #     #                 "Min" = "min",
+            #     #     #                 "Mean" = "mean",
+            #     #     #                 "Median" = "median"
+            #     #     #             ),
+            #     #     #             selected = "max",
+            #     #     #             width = 130
+            #     #     #         )
+            #     #     #     ),
+            #     #     #     column(
+            #     #     #         4,
+            #     #     #         selectInput(
+            #     #     #             "var2Relation", label = h5("Relationship:"),
+            #     #     #             choices = list(
+            #     #     #                 "Prot-Prot" = "protein", 
+            #     #     #                 "Prot-Spec" = "species"
+            #     #     #             ),
+            #     #     #             selected = "protein",
+            #     #     #             width = 130
+            #     #     #         )
+            #     #     #     )
+            #     #     # ),
+            #     #     # hr(),
+            #     # 
+            #     #     # # ** Domain input ------------------------------------------
+            #     #     # strong(h4("Additional annotation input:")),
+            #     #     # radioButtons(
+            #     #     #     inputId = "annoLocation", label = "",
+            #     #     #     choices = list("from file", "from folder"),
+            #     #     #     selected = "from file",
+            #     #     #     inline = TRUE
+            #     #     # ),
+            #     #     # 
+            #     #     # uiOutput("domainInputFile.ui"),
+            #     #     # 
+            #     #     # hr(),
+            #     #     # uiOutput("downloadDemo.ui")
+            #     # ),
+            # 
+            #     # * 2nd column -------------------------------------------------
+            #     # column(
+            #     #     3,
+            #     #     # bsAlert("fileExistMsgUI"),
+            #     #     # bsAlert("inputMsgUI"),
+            #     # 
+            #     #     # # ** List of new taxa --------------------------------------
+            #     #     # conditionalPanel(
+            #     #     #     condition = "output.unkTaxaStatus == 'unknown' ||
+            #     #     #     output.unkTaxaStatus == 'ncbi' ||
+            #     #     #     output.unkTaxaStatus == 'invalid'",
+            #     #     #     strong(h4("New taxa were found:")),
+            #     #     #     DT::dataTableOutput("unkTaxaFull"),
+            #     #     #     br(),
+            #     #     #     downloadButton("unkTaxa.download", "Download ID list")
+            #     #     # ),
+            #     # 
+            #     #     # ** Other input options -----------------------------------
+            #     #     conditionalPanel(
+            #     #         condition = "output.unkTaxaStatus == 0",
+            #     #         # strong(h4("Choose genes of interest:")),
+            #     #         # radioButtons(
+            #     #         #     inputId = "geneListSelected",
+            #     #         #     label = "",
+            #     #         #     choices = list("all", "from file"),
+            #     #         #     selected = "all",
+            #     #         #     inline = TRUE
+            #     #         # ),
+            #     #         # 
+            #     #         # conditionalPanel(
+            #     #         #     condition = "input.geneListSelected == 'from file'",
+            #     #         #     fileInput("geneList", "")
+            #     #         # ),
+            #     #         # uiOutput("totalGeneNumber.ui"),
+            #     #         # column(
+            #     #         #     6,
+            #     #         #     numericInput(
+            #     #         #         "stIndex",
+            #     #         #         h5("Show from:"),
+            #     #         #         min = 1,
+            #     #         #         max = 1600,
+            #     #         #         value = 1,
+            #     #         #         width = 130
+            #     #         #     )
+            #     #         # ),
+            #     #         # 
+            #     #         # column(
+            #     #         #     6,
+            #     #         #     numericInput(
+            #     #         #         "endIndex",
+            #     #         #         h5("...to:"),
+            #     #         #         min = 1,
+            #     #         #         max = 1600,
+            #     #         #         value = 1000,
+            #     #         #         width = 130
+            #     #         #     )
+            #     #         # ),
+            #     #         # bsPopover(
+            #     #         #     "stIndex",
+            #     #         #     "",
+            #     #         #     "Set start index for sequence range",
+            #     #         #     "bottom"
+            #     #         # ),
+            #     #         # 
+            #     #         # bsPopover(
+            #     #         #     "endIndex",
+            #     #         #     "",
+            #     #         #     "Set end index for sequence range",
+            #     #         #     "bottom"
+            #     #         # ),
+            #     #         # hr(),
+            #     # 
+            #     #         # strong(h4("Sequence source:")),
+            #     #         # column(
+            #     #         #     6,
+            #     #         #     selectInput(
+            #     #         #         "seedSource",
+            #     #         #         label = h5("Seeds:"),
+            #     #         #         choices = list(
+            #     #         #             "NCBI" = "ncbi",
+            #     #         #             "UniProt" = "uniprot",
+            #     #         #             "OrthoDB" = "orthodb",
+            #     #         #             "OMA" = "oma",
+            #     #         #             "User-defined" = "user"
+            #     #         #         ),
+            #     #         #         selected = "uniprot",
+            #     #         #         width = 130
+            #     #         #     ),
+            #     #         #     conditionalPanel(
+            #     #         #         condition = "input.seedSource == 'orthodb'",
+            #     #         #         textInput(
+            #     #         #             "orthodbSeedVer",
+            #     #         #             h5("OrthoDB version"),
+            #     #         #             value = "",
+            #     #         #             placeholder = "latest"
+            #     #         #         ),
+            #     #         #         bsPopover(
+            #     #         #             "orthodbSeedVer",
+            #     #         #             "",
+            #     #         #             paste(
+            #     #         #                 "Leave blank for latest version"
+            #     #         #             ),
+            #     #         #             "bottom"
+            #     #         #         )
+            #     #         #     )
+            #     #         # ),
+            #     #         # column(
+            #     #         #     6,
+            #     #         #     selectInput(
+            #     #         #         "orthoSource",
+            #     #         #         label = h5("Orthologs:"),
+            #     #         #         choices = list(
+            #     #         #             "NCBI" = "ncbi",
+            #     #         #             "UniProt" = "uniprot",
+            #     #         #             "OrthoDB" = "orthodb",
+            #     #         #             "OMA" = "oma",
+            #     #         #             "User-defined" = "user"
+            #     #         #         ),
+            #     #         #         selected = "ncbi",
+            #     #         #         width = 130
+            #     #         #     ),
+            #     #         #     conditionalPanel(
+            #     #         #         condition = "input.orthoSource == 'orthodb'",
+            #     #         #         textInput(
+            #     #         #             "orthodbOrthoVer",
+            #     #         #             h5("OrthoDB version"),
+            #     #         #             value = "",
+            #     #         #             placeholder = "e.g. 10-1"
+            #     #         #         ),
+            #     #         #         bsPopover(
+            #     #         #             "orthodbOrthoVer",
+            #     #         #             "",
+            #     #         #             paste(
+            #     #         #                 "Leave blank for latest version"
+            #     #         #             ),
+            #     #         #             "bottom"
+            #     #         #         )
+            #     #         #     )
+            #     #         # ),
+            #     #         # actionButton(
+            #     #         #     "selectSequenceID", "Ortholog ID format",
+            #     #         #     style = "padding:4px; font-size:100%"
+            #     #         # ),
+            #     #         # h5(""),
+            #     #         # hr(),
+            #     #         
+            #     #         # checkboxInput(
+            #     #         #     "ordering",
+            #     #         #     strong("Order seed IDs"),
+            #     #         #     value = TRUE
+            #     #         # ),
+            #     #         # hr(),
+            #     #         
+            #     #         # strong(h4("Color configuration:")),
+            #     #         # actionButton(
+            #     #         #     "setColor", "Change colors",
+            #     #         #     style = "padding:4px; font-size:100%"
+            #     #         # ),
+            #     #         # hr(),
+            #     # 
+            #     #         strong(h4("Other optional input:")),
+            #     # 
+            #     #         bsButton("fastaUpload", "FASTA file(s)"),
+            #     #         h5(""),
+            #     # 
+            #     #         bsButton("uploadGeneCategory", "Gene categories"),
+            #     #         h5(""),
+            #     #         hr()
+            #     #     )
+            #     # ),
+            # 
+            #     # * 3rd column -------------------------------------------------
+            #     column(
+            #         4,
+            #         # ** Location for taxonomy files ---------------------------
+            #         # strong(h4("Taxonomy DB location:")),
+            #         # radioButtons(
+            #         #     inputId = "taxDbLoc", label = "",
+            #         #     choices = list("Default", "User-defined"),
+            #         #     selected = "Default",
+            #         #     inline = TRUE
+            #         # ),
+            #         # conditionalPanel(
+            #         #     condition = "input.taxDbLoc == 'User-defined'",
+            #         #     shinyDirButton(
+            #         #         "taxDbDir", "Select taxonomy DB" ,
+            #         #         title = "Please select a folder",
+            #         #         buttonType = "default", class = NULL
+            #         #     ),
+            #         #     br(), br(),
+            #         #     uiOutput("userTaxDBwarning")
+            #         # ),
+            #         # verbatimTextOutput("taxDbPath"),
+            #         # hr(),
+            # 
+            #         # # ** Msg for parsing new taxa ------------------------------
+            #         # conditionalPanel(
+            #         #     condition = "output.unkTaxaStatus == 'unknown' ||
+            #         #     output.unkTaxaStatus == 'ncbi' ||
+            #         #     output.unkTaxaStatus == 'invalid'",
+            #         # 
+            #         #     conditionalPanel(
+            #         #         condition = "output.unkTaxaStatus == 'invalid'",
+            #         #         HTML(
+            #         #             "<p><em>Some new taxa have
+            #         #             <span style=\"color: #ff0000;\">invalid IDs
+            #         #             </span> (either in newTaxa.txt or in the main
+            #         #             profile input or both). IDs of non-NCBI taxa
+            #         #             have to be greater than 999999005.</em></p>
+            #         #             <p><em>Please replace those IDs before
+            #         #             continuing!</em></p>"
+            #         #         )
+            #         #     ),
+            #         # 
+            #         #     conditionalPanel(
+            #         #         condition = "output.unkTaxaStatus == 'unknown'",
+            #         #         HTML(
+            #         #             '<p><em>NCBI taxonomy information of some taxa
+            #         #             can neither</em></p><ul><li><em>be retrieved
+            #         #             from NCBI (<span style="color: #0000ff;
+            #         #             ">Source="ncbi"</span>) nor </em></li>
+            #         #             <li><em>be found in
+            #         #             <span style="color: #ff0000;">
+            #         #             PhyloProfile/data/newTaxa.txt</span>&nbsp;(<span
+            #         #             style="color: #0000ff;">Source="new"</span>)
+            #         #             file</em></li></ul><p><strong><em>Please add
+            #         #             taxonomy information for those unknown taxa and
+            #         #             <span style="color: #ff0000;"> reload the tool
+            #         #             </span> to continue!</em></strong></p>'
+            #         #         ),
+            #         #         h5(""),
+            #         #         bsButton(
+            #         #             "addTaxa",
+            #         #             "Add taxonomy info",
+            #         #             disabled = FALSE,
+            #         #             style = "warning"
+            #         #         )
+            #         #     ),
+            #         # 
+            #         #     conditionalPanel(
+            #         #         condition = "output.unkTaxaStatus == 'ncbi'",
+            #         #         HTML(
+            #         #             '<p><em>NCBI taxonomy information of some taxa
+            #         #             can either</em></p><ul><li><em>be retrieved
+            #         #             from NCBI (<span style="color: #0000ff;
+            #         #             ">Source="ncbi"</span>) or </em></li>
+            #         #             <li><em>be found in
+            #         #             <span style="color: #ff0000;">
+            #         #             PhyloProfile/data/newTaxa.txt</span>&nbsp;(<span
+            #         #             style="color: #0000ff;">Source="new"</span>)
+            #         #             file</em></li></ul><p><strong><em>Click here to
+            #         #             get required taxonomy information for those
+            #         #             taxa!</em></strong></p>'
+            #         #         ),
+            #         #         h5(""),
+            #         #         bsButton(
+            #         #             "butParse",
+            #         #             "Get taxonomy info",
+            #         #             disabled = FALSE,
+            #         #             style = "warning"
+            #         #         ),
+            #         # 
+            #         #         hr(),
+            #         #         uiOutput("endParsingMsg"),
+            #         #         tableOutput("invalidID.output"),
+            #         #         hr(),
+            #         #         conditionalPanel(
+            #         #             condition = "output.unkTaxaStatus
+            #         #                         == 'invalid'",
+            #         #             downloadButton(
+            #         #                 "invalidID.download", "Download invalid IDs"
+            #         #             )
+            #         #         )
+            #         #     )
+            #         # ),
+            # 
+            #         # ** List of ranks & available taxa ------------------------
+            #         conditionalPanel(
+            #             condition = "output.unkTaxaStatus == 0",
+            #             strong(h4("Seed (super)taxon:")),
+            #             br(),
+            # 
+            #             # strong(h5("Select taxonomy rank:")),
+            #             # uiOutput("rankSelect"),
+            #             # br(),
+            # 
+            #             # strong(h5("Choose (super)taxon of interest:")),
+            #             # selectizeInput(
+            #             #     "inSelect", "", choices = NULL, selected = NULL
+            #             # ),
+            # 
+            #             hr(),
+            #             # strong(h4("Order taxa")),
+            #             # radioButtons(
+            #             #     inputId = "orderTaxa",
+            #             #     label = "",
+            #             #     choices = list(
+            #             #         "automatically", "by user defined tree",
+            #             #         "by a sorted list"
+            #             #     ),
+            #             #     selected = "automatically",
+            #             #     inline = TRUE
+            #             # ),
+            #             # conditionalPanel(
+            #             #     condition = "input.orderTaxa
+            #             #                 == 'by user defined tree'",
+            #             #     uiOutput("inputTree.ui"),
+            #             #     bsPopover(
+            #             #         "orderTaxa", "", "in newick format", "bottom"
+            #             #     ),
+            #             #     uiOutput("checkNewick.ui")
+            #             # ),
+            #             # conditionalPanel(
+            #             #     condition = "input.orderTaxa
+            #             #                 == 'by a sorted list'",
+            #             #     uiOutput("inputSortedTaxa.ui"),
+            #             #     uiOutput("checkSortedTaxa.ui")
+            #             # ),
+            #             
+            #             # checkboxInput(
+            #             #     "showAllTaxa",
+            #             #     strong("Display all input taxa"),
+            #             #     value = FALSE,
+            #             #     width = NULL
+            #             # ),
+            #             # bsPopover(
+            #             #     "showAllTaxa",
+            #             #     "",
+            #             #     "Including taxa with no orthologs",
+            #             #     "bottom"
+            #             # ), 
+            #             # hr(),
+            # 
+            #             bsButton(
+            #                 "do",
+            #                 "PLOT",
+            #                 type = "action",
+            #                 style = "danger",
+            #                 size = "large",
+            #                 disabled = FALSE
+            #             ),
+            #             h5("")
+            #         )
+            #     )
+            # ),
 
             # MAIN PROFILE TAB =================================================
             tabPanel(
@@ -696,11 +697,11 @@ shinyUI(
                         ),
                         column(
                             12,
-                            checkboxInput(
-                                "colorByGroup",
-                                strong("Highlight genes by categories"),
-                                value = FALSE
-                            ),
+                            # checkboxInput(
+                            #     "colorByGroup",
+                            #     strong("Highlight genes by categories"),
+                            #     value = FALSE
+                            # ),
                             checkboxInput(
                                 "colorByOrthoID",
                                 strong("Highlight duplicated ortholog IDs"),
@@ -760,6 +761,10 @@ shinyUI(
                             12,
                             style = "padding:0px;",
                             uiOutput("cusSelectTaxonRank.ui"),
+                            strong(h5("Choose (super)taxon of interest:")),
+                            selectizeInput(
+                                "inSelect", "", choices = NULL, selected = NULL
+                            )
                         ),
                         column(
                             12,
@@ -1325,100 +1330,100 @@ shinyUI(
 
         # LIST OF POP-UP WINDOWS ===============================================
 
-        # * popup for getting taxa from OMA browser ----------------------------
-        bsModal(
-            "getOmaDataWindows",
-            "Get OMA data",
-            "openOmaWindows",
-            size = "small",
-            selectInput(
-                "selectedOmaType",
-                label = "Select type of OMA orthologs:",
-                choices = list("HOG", "OG"),# "PAIR"),
-                selected = "HOG"
-            ),
-            bsButton("getDataOma", "Get data", style = "danger"),
-            downloadButton("downloadFilesOma", "Save data"),
-            br(),
-            em("This windows will close automatically when eveything is done!",
-               style = "color:red")
-        ),
-
-        # * popup for adding new taxa from input file --------------------------
-        bsModal(
-            "addTaxaWindows",
-            "Add new taxa",
-            "addTaxa",
-            size = "medium",
-            HTML(
-                "<p><em>Use this form to add taxon that does not exist in NCBI
-                taxonomy database (or alternatively you can manually prepare the
-                <span style=\"text-decoration: underline;\">
-                <span style=\"color: #ff0000; text-decoration: underline;\">
-                PhyloProfile/data/newTaxa.txt file with the following
-                description for each field).</em></p>
-                <p><span style=\"color: #ff0000;\"><em><strong>
-                NOTE: ID and name of new taxon must be
-                <span style=\"text-decoration: underline;\">different</span>
-                from any existing NCBI taxa.</strong></em></span></p>"
-            ),
-            textInput(
-                "newID",
-                "ID (must be a number and greater than 999999005,
-                e.g. 999999901)",
-                999999901,
-                width = 500
-            ),
-            textInput(
-                "newName",
-                "Name (e.g. Saccharomyces cerevisiae strain ABC)",
-                "",
-                width = 500
-            ),
-            textInput(
-                "newRank",
-                "Rank (e.g. strain, species, order, etc.)",
-                "species",
-                width = 500
-            ),
-            textInput(
-                "newParent",
-                "Parent ID (NCBI taxonomy ID of the next higher rank,
-                e.g. 4932 (S.cerevisiae species))",
-                4932,
-                width = 500
-            ),
-            actionButton("newAdd", "Add new taxon"),
-            hr(),
-            fileInput("newTaxaFile",
-                      "Or upload file contains IDs for new taxa"),
-            HTML(
-                "<p><em>Taxonomy file for new taxa has to be a tab-delimited
-                text file and has the following header (please follow the rule
-                above):</em></p><p>ncbiID &nbsp;fullName &nbsp;rank
-                &nbsp;parentID</p>"
-            ),
-            bsAlert("wrongNewTaxa"),
-            hr(),
-            bsButton(
-                "newDone", "Finish adding", style = "warning", disabled = TRUE
-            )
-        ),
-
-        # * popup for confirming parsing taxa from input file ------------------
-        bsModal(
-            "parseConfirm",
-            "Get taxonomy info",
-            "butParse",
-            size = "small",
-            HTML(
-                '<p>Fetching Missing Taxonomy Information and
-                Post-processing.</p><p><em>This windows will close
-                automatically when eveything is done. Please wait...</em></p>
-                <p><strong><span style="color: #ff0000;">PLEASE RELOAD THIS
-                TOOL WHEN FINISHED!!!</span></strong></p>'
-            )
-        ),
+        # # * popup for getting taxa from OMA browser ----------------------------
+        # bsModal(
+        #     "getOmaDataWindows",
+        #     "Get OMA data",
+        #     "openOmaWindows",
+        #     size = "small",
+        #     selectInput(
+        #         "selectedOmaType",
+        #         label = "Select type of OMA orthologs:",
+        #         choices = list("HOG", "OG"),# "PAIR"),
+        #         selected = "HOG"
+        #     ),
+        #     bsButton("getDataOma", "Get data", style = "danger"),
+        #     downloadButton("downloadFilesOma", "Save data"),
+        #     br(),
+        #     em("This windows will close automatically when eveything is done!",
+        #        style = "color:red")
+        # ),
+        # 
+        # # * popup for adding new taxa from input file --------------------------
+        # bsModal(
+        #     "addTaxaWindows",
+        #     "Add new taxa",
+        #     "addTaxa",
+        #     size = "medium",
+        #     HTML(
+        #         "<p><em>Use this form to add taxon that does not exist in NCBI
+        #         taxonomy database (or alternatively you can manually prepare the
+        #         <span style=\"text-decoration: underline;\">
+        #         <span style=\"color: #ff0000; text-decoration: underline;\">
+        #         PhyloProfile/data/newTaxa.txt file with the following
+        #         description for each field).</em></p>
+        #         <p><span style=\"color: #ff0000;\"><em><strong>
+        #         NOTE: ID and name of new taxon must be
+        #         <span style=\"text-decoration: underline;\">different</span>
+        #         from any existing NCBI taxa.</strong></em></span></p>"
+        #     ),
+        #     textInput(
+        #         "newID",
+        #         "ID (must be a number and greater than 999999005,
+        #         e.g. 999999901)",
+        #         999999901,
+        #         width = 500
+        #     ),
+        #     textInput(
+        #         "newName",
+        #         "Name (e.g. Saccharomyces cerevisiae strain ABC)",
+        #         "",
+        #         width = 500
+        #     ),
+        #     textInput(
+        #         "newRank",
+        #         "Rank (e.g. strain, species, order, etc.)",
+        #         "species",
+        #         width = 500
+        #     ),
+        #     textInput(
+        #         "newParent",
+        #         "Parent ID (NCBI taxonomy ID of the next higher rank,
+        #         e.g. 4932 (S.cerevisiae species))",
+        #         4932,
+        #         width = 500
+        #     ),
+        #     actionButton("newAdd", "Add new taxon"),
+        #     hr(),
+        #     fileInput("newTaxaFile",
+        #               "Or upload file contains IDs for new taxa"),
+        #     HTML(
+        #         "<p><em>Taxonomy file for new taxa has to be a tab-delimited
+        #         text file and has the following header (please follow the rule
+        #         above):</em></p><p>ncbiID &nbsp;fullName &nbsp;rank
+        #         &nbsp;parentID</p>"
+        #     ),
+        #     bsAlert("wrongNewTaxa"),
+        #     hr(),
+        #     bsButton(
+        #         "newDone", "Finish adding", style = "warning", disabled = TRUE
+        #     )
+        # ),
+        # 
+        # # * popup for confirming parsing taxa from input file ------------------
+        # bsModal(
+        #     "parseConfirm",
+        #     "Get taxonomy info",
+        #     "butParse",
+        #     size = "small",
+        #     HTML(
+        #         '<p>Fetching Missing Taxonomy Information and
+        #         Post-processing.</p><p><em>This windows will close
+        #         automatically when eveything is done. Please wait...</em></p>
+        #         <p><strong><span style="color: #ff0000;">PLEASE RELOAD THIS
+        #         TOOL WHEN FINISHED!!!</span></strong></p>'
+        #     )
+        # ),
 
         # * popup for plotting detailed plot -----------------------------------
         bsModal(
@@ -1512,92 +1517,92 @@ shinyUI(
         ),
 
         # * popup for FASTA upload ---------------------------------------------
-        bsModal(
-            "fastaUploadBs",
-            "FASTA upload",
-            "fastaUpload",
-            size = "small",
-            selectInput(
-                "inputType", "Choose location for:",
-                c("Concatenated fasta file", "Fasta folder")
-            ),
-            hr(),
-            uiOutput("defaultColorPara.ui"),
-            conditionalPanel(
-                condition = "input.inputType == 'Concatenated fasta file'",
-                fileInput("concatFasta", ""),
-                uiOutput("concatFasta.existCheck")
-            ),
-            conditionalPanel(
-                condition = "input.inputType == 'Fasta folder'",
-                textInput("path", "Main FULL path:", ""),
-                selectInput(
-                    "dirFormat", "Directory format:",
-                    choices = list("path/speciesID.fa*" = 1,
-                                   "path/speciesID/speciesID.fa*" = 2),
-                    selected = "Path/speciesID.fasta"
-                ),
-                selectInput(
-                    "fileExt", "File extension:",
-                    choices = list("fa" = "fa",
-                                   "fasta" = "fasta",
-                                   "fas" = "fas",
-                                   "txt" = "txt"),
-                    selected = "fa"
-                ),
-                selectInput(
-                    "idFormat",
-                    "ID format:",
-                    choices = list(">speciesID:seqID" = 1,
-                                   ">speciesID@seqID" = 2,
-                                   ">speciesID|seqID" = 3,
-                                   ">seqID" = 4),
-                    selected = 4
-                )
-            )
-        ),
+        # bsModal(
+        #     "fastaUploadBs",
+        #     "FASTA upload",
+        #     "fastaUpload",
+        #     size = "small",
+        #     selectInput(
+        #         "inputType", "Choose location for:",
+        #         c("Concatenated fasta file", "Fasta folder")
+        #     ),
+        #     hr(),
+        #     uiOutput("defaultColorPara.ui"),
+        #     conditionalPanel(
+        #         condition = "input.inputType == 'Concatenated fasta file'",
+        #         fileInput("concatFasta", ""),
+        #         uiOutput("concatFasta.existCheck")
+        #     ),
+        #     conditionalPanel(
+        #         condition = "input.inputType == 'Fasta folder'",
+        #         textInput("path", "Main FULL path:", ""),
+        #         selectInput(
+        #             "dirFormat", "Directory format:",
+        #             choices = list("path/speciesID.fa*" = 1,
+        #                            "path/speciesID/speciesID.fa*" = 2),
+        #             selected = "Path/speciesID.fasta"
+        #         ),
+        #         selectInput(
+        #             "fileExt", "File extension:",
+        #             choices = list("fa" = "fa",
+        #                            "fasta" = "fasta",
+        #                            "fas" = "fas",
+        #                            "txt" = "txt"),
+        #             selected = "fa"
+        #         ),
+        #         selectInput(
+        #             "idFormat",
+        #             "ID format:",
+        #             choices = list(">speciesID:seqID" = 1,
+        #                            ">speciesID@seqID" = 2,
+        #                            ">speciesID|seqID" = 3,
+        #                            ">seqID" = 4),
+        #             selected = 4
+        #         )
+        #     )
+        # ),
 
         # * popup for upload gene category -------------------------------------
-        bsModal(
-            "uploadGeneCategoryBs",
-            "Upload gene categories",
-            "uploadGeneCategory",
-            size = "small",
-            fileInput("geneCategory", "")
-        ),
+        # bsModal(
+        #     "uploadGeneCategoryBs",
+        #     "Upload gene categories",
+        #     "uploadGeneCategory",
+        #     size = "small",
+        #     fileInput("geneCategory", "")
+        # ),
         
         
         # * popup for setting ortholog ID format -------------------------------
-        bsModal(
-            "seqIDBs",
-            "Sequence ID format",
-            "selectSequenceID",
-            size = "small",
-            selectInput(
-                "seqIdFormat",
-                "ID format:",
-                choices = list(
-                    "BIONF format (seed|taxon|ortho)" = 1,
-                    "seqID" = 2,
-                    "something<separator>seqID" = 3,
-                    "seqID<separator>something" = 4
-                ),
-                selected = 1
-            ),
-            selectInput(
-                "separator",
-                "Separator:",
-                choices = list(
-                    "none" = "none",
-                    "|" = 1,
-                    "@" = 2,
-                    "#" = 3,
-                    ";" = 4
-                ),
-                selected = 1
-            ),
-            em("Please note! Only these ID formats are accepted!")
-        ),
+        # bsModal(
+        #     "seqIDBs",
+        #     "Sequence ID format",
+        #     "selectSequenceID",
+        #     size = "small",
+        #     selectInput(
+        #         "seqIdFormat",
+        #         "ID format:",
+        #         choices = list(
+        #             "BIONF format (seed|taxon|ortho)" = 1,
+        #             "seqID" = 2,
+        #             "something<separator>seqID" = 3,
+        #             "seqID<separator>something" = 4
+        #         ),
+        #         selected = 1
+        #     ),
+        #     selectInput(
+        #         "separator",
+        #         "Separator:",
+        #         choices = list(
+        #             "none" = "none",
+        #             "|" = 1,
+        #             "@" = 2,
+        #             "#" = 3,
+        #             ";" = 4
+        #         ),
+        #         selected = 1
+        #     ),
+        #     em("Please note! Only these ID formats are accepted!")
+        # ),
 
         # * popup for setting Main plot configurations -------------------------
         bsModal(
