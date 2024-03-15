@@ -58,17 +58,17 @@ createProfilePlot <- function(input, output, session,
             }
         }
         # add all input taxa (if available)
-        if (!(is.null(allTaxa()))) {
-            mergedDf <- merge(
-                dataHeat, allTaxa(), by = c("supertaxonID","supertaxon"),
-                all = TRUE
-            )
-            mergedDf$geneID[is.na(mergedDf$geneID)] <- dataHeat$geneID[1]
-            mergedDf$supertaxon <- factor(
-                mergedDf$supertaxon, levels = levels(allTaxa()$supertaxon)
-            )
-            return(mergedDf)
-        }
+        # if (!(is.null(allTaxa()))) {
+        #     mergedDf <- merge(
+        #         dataHeat, allTaxa(), by = c("supertaxonID","supertaxon"),
+        #         all = TRUE
+        #     )
+        #     mergedDf$geneID[is.na(mergedDf$geneID)] <- dataHeat$geneID[1]
+        #     mergedDf$supertaxon <- factor(
+        #         mergedDf$supertaxon, levels = levels(allTaxa()$supertaxon)
+        #     )
+        #     return(mergedDf)
+        # }
         return(dataHeat)
     })
 
