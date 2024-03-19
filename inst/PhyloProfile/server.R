@@ -221,6 +221,10 @@ shinyServer(function(input, output, session) {
             "percent2", "% of present taxa:", 0.0, 1.0, "percent"
         )
     })
+    
+    observeEvent(input$plotCustom, {
+        shinyjs::disable("percent2")
+    })
 
     output$coorthologFilter.ui <- renderUI({
         numericInput(
@@ -329,15 +333,6 @@ shinyServer(function(input, output, session) {
             input$updateBtn
         }
         
-        # check input file
-        # filein <- input$mainInput
-        # if (
-        #     input$demoData == "arthropoda" | input$demoData == "ampk-tor" |
-        #     input$demoData == "preCalcDt"
-        # ) {
-        #     filein <- 1
-        # }
-        # req(filein)
         withProgress(message = 'Creating data for plotting...', value = 0.5, {
             # get all cutoffs
             if (input$autoUpdate == TRUE) {
@@ -345,66 +340,37 @@ shinyServer(function(input, output, session) {
                 coorthologCutoffMax <- input$coortholog
                 var1Cutoff <- input$var1
                 var2Cutoff <- input$var2
-                colorByGroup <- input$colorByGroup
             } else {
                 percentCutoff <- isolate(input$percent)
                 coorthologCutoffMax <- isolate(input$coortholog)
                 var1Cutoff <- isolate(input$var1)
                 var2Cutoff <- isolate(input$var2)
-                colorByGroup <- isolate(input$colorByGroup)
             }
 
-            # get selected supertaxon name
-            split <- strsplit(as.character(input$inSelect), "_")
-            inSelect <- as.character(split[[1]][1])
-
-            # # get gene categories
-            # inputCatDt <- NULL
-            # if (length(colorByGroup) > 0 && colorByGroup == TRUE) {
-            #     # get gene category
-            #     geneCategoryFile <- input$geneCategory
-            #     if (!is.null(geneCategoryFile)) {
-            #         inputCatDt <- read.table(
-            #             file = geneCategoryFile$datapath,
-            #             sep = "\t",
-            #             header = FALSE,
-            #             check.names = FALSE,
-            #             comment.char = "",
-            #             fill = TRUE
-            #         )
-            #         colnames(inputCatDt) <- c("geneID","group")
-            #     } else if (!is.null(i_geneCategory)){
-            #         inputCatDt <- read.table(
-            #             file = i_geneCategory,
-            #             sep = "\t",
-            #             header = FALSE,
-            #             check.names = FALSE,
-            #             comment.char = "",
-            #             fill = TRUE
-            #         )
-            #         colnames(inputCatDt) <- c("geneID","group")
-            #     } else inputCatDt <- NULL
-            # } else colorByGroup = FALSE
-            # 
-            # # create data for heatmap plotting
-            # filteredDf <- filterProfileData(
-            #     DF = getFullData(),
-            #     taxaCount = getCountTaxa(),
-            #     refTaxon = inSelect,
-            #     percentCutoff,
-            #     coorthologCutoffMax,
-            #     var1Cutoff,
-            #     var2Cutoff,
-            #     var1Relation,
-            #     var2Relation,
-            #     groupByCat = colorByGroup,
-            #     catDt = inputCatDt,
-            #     var1AggregateBy = var1AggregateBy,
-            #     var2AggregateBy = var2AggregateBy
-            # )
             # saveRDS(filteredDf, file = paste0("data/filteredDf",input$rankSelect,".rds"))
             filteredDf <- readRDS(paste0("data/filteredDf",input$rankSelect,".rds"))
-            ### NEED TO APPLY FILTERED HERERE!!!!
+      
+            ### Filter mVar and presSpec
+            filteredDf$mVar1[filteredDf$mVar1 < var1Cutoff[1]] <- NA
+            filteredDf$mVar1[filteredDf$mVar1 > var1Cutoff[2]] <- NA
+            filteredDf$mVar2[filteredDf$mVar2 < var2Cutoff[1]] <- NA
+            filteredDf$mVar2[filteredDf$mVar2 > var2Cutoff[2]] <- NA
+            
+            filteredDf$presSpec[
+                filteredDf$presSpec < percentCutoff[[1]] | filteredDf$presSpec > percentCutoff[[2]]
+            ] <-0
+            filteredDf$orthoID[filteredDf$presSpec == 0] <- NA
+            
+            filteredDf$orthoID[is.na(filteredDf$mVar1)] <- NA
+            filteredDf$mVar1[is.na(filteredDf$orthoID)] <- NA
+            filteredDf$orthoID[is.na(filteredDf$mVar2)] <- NA
+            filteredDf$mVar2[is.na(filteredDf$orthoID)] <- NA
+            
+            filteredDf$presSpec[is.na(filteredDf$orthoID)] <- 0
+            filteredDf$mVar1[filteredDf$presSpec == 0] <- NA
+            filteredDf$mVar2[filteredDf$presSpec == 0] <- NA
+            filteredDf <- droplevels(filteredDf)
+            
             return(filteredDf)
         })
     })
@@ -634,7 +600,7 @@ shinyServer(function(input, output, session) {
         inSeq = reactive(input$inSeq),
         inTaxa = reactive(input$inTaxa),
         rankSelect = reactive(input$rankSelect),
-        inSelect = reactive(input$inSelect),
+        inSelect = NULL, #reactive(input$inSelect),
         taxonHighlight = reactive(input$taxonHighlight),
         geneHighlight = reactive(input$geneHighlight),
         typeProfile = reactive("mainProfile"),
@@ -708,9 +674,10 @@ shinyServer(function(input, output, session) {
         choice$fullName <- as.factor(choice$fullName)
         selectInput(
             "cusTaxonSelect",
-            label = h5("Choose (super)taxon of interest:"),
+            label = h5("Choose (super)taxon/taxa:"),
             as.list(levels(choice$fullName)),
-            levels(choice$fullName)[1]
+            levels(choice$fullName)[1],
+            multiple = TRUE
         )
     })
 
@@ -719,30 +686,38 @@ shinyServer(function(input, output, session) {
         req(input$cusRankSelect)
         taxaSelectCus <- input$cusTaxonSelect
         rankName <- input$cusRankSelect
-        if (taxaSelectCus == "") return()
+        if (taxaSelectCus[1] == "") return()
         
         # load list of unsorted taxa
         Dt <- getTaxonomyMatrix(taxDBpath, TRUE, inputTaxonID())
         
         # get ID of selected (super)taxon from input$taxaSelectCus
         taxaList <- getNameList(taxDBpath)
-        superID <- taxaList$ncbiID[taxaList$fullName == taxaSelectCus
+        superID <- taxaList$ncbiID[taxaList$fullName %in% taxaSelectCus
                                    & taxaList$rank %in% c(rankName, "norank")]
-
         # from that ID, get list of all taxa for main selected taxon
         mainRankName <- "strain" #rankSelect()
         customizedtaxaID <-
-            levels(as.factor(Dt[mainRankName][Dt[rankName] == superID, ]))
+            lapply(
+                superID, 
+                function (x) {
+                    return(levels(as.factor(Dt[mainRankName][Dt[rankName] == x, ])))
+                }
+            )
+            # levels(as.factor(Dt[mainRankName][Dt[rankName] %in% superID, ]))
         
         cusTaxaName <-
-            taxaList$fullName[taxaList$ncbiID %in% customizedtaxaID]
+            taxaList$fullName[taxaList$ncbiID %in% unlist(customizedtaxaID)]
         return(cusTaxaName)
     })
     
     output$cusTaxa.ui <- renderUI({
         input$plotCustom
         out <- isolate(cusTaxa())
-        selectizeInput("inTaxa","Selected taxa",out, selected = out, multiple = TRUE)
+        selectizeInput(
+            "inTaxa",paste(length(out), "selected taxa:"),
+            out, selected = out, multiple = TRUE
+        )
     })
 
     # * render list of superRanks for adding vertical lines --------------------
@@ -901,9 +876,42 @@ shinyServer(function(input, output, session) {
 
     # * plot customized profile ------------------------------------------------
     cusFilteredDataHeat <- reactive ({
-        filteredDf <- readRDS("data/filteredDfstrain.rds")
-        ### NEED TO APPLY FILTERED HERERE!!!!
-        return(filteredDf)
+        {
+            input$plotCustom
+            input$updateBtn
+        }
+        
+        withProgress(message = 'Creating data for plotting...', value = 0.5, {
+            # get all cutoffs
+            percentCutoff <- isolate(input$percent2)
+            var1Cutoff <- isolate(input$var1cus)
+            var2Cutoff <- isolate(input$var2cus)
+            
+            filteredDf <- readRDS("data/filteredDfstrain.rds")
+
+            ### Filter mVar and presSpec
+            filteredDf$mVar1[filteredDf$mVar1 < var1Cutoff[1]] <- NA
+            filteredDf$mVar1[filteredDf$mVar1 > var1Cutoff[2]] <- NA
+            filteredDf$mVar2[filteredDf$mVar2 < var2Cutoff[1]] <- NA
+            filteredDf$mVar2[filteredDf$mVar2 > var2Cutoff[2]] <- NA
+            
+            filteredDf$presSpec[
+                filteredDf$presSpec < percentCutoff[[1]] | filteredDf$presSpec > percentCutoff[[2]]
+            ] <-0
+            filteredDf$orthoID[filteredDf$presSpec == 0] <- NA
+            
+            filteredDf$orthoID[is.na(filteredDf$mVar1)] <- NA
+            filteredDf$mVar1[is.na(filteredDf$orthoID)] <- NA
+            filteredDf$orthoID[is.na(filteredDf$mVar2)] <- NA
+            filteredDf$mVar2[is.na(filteredDf$orthoID)] <- NA
+            
+            filteredDf$presSpec[is.na(filteredDf$orthoID)] <- 0
+            filteredDf$mVar1[filteredDf$presSpec == 0] <- NA
+            filteredDf$mVar2[filteredDf$presSpec == 0] <- NA
+            filteredDf <- droplevels(filteredDf)
+            
+            return(filteredDf)
+        })
     })
     cusDataHeat <- reactive({
         return(reduceProfile(cusFilteredDataHeat()))
@@ -943,8 +951,8 @@ shinyServer(function(input, output, session) {
         parameters = getParameterInputCustomized,
         inSeq = reactive(input$inSeq),
         inTaxa = reactive(input$inTaxa),
-        rankSelect = reactive(input$rankSelect),
-        inSelect = reactive(input$inSelect),
+        rankSelect = reactive("strain"),
+        inSelect = NULL, #reactive(input$inSelect),
         taxonHighlight = reactive("none"),
         geneHighlight = reactive("none"),
         typeProfile = reactive("customizedProfile"),
@@ -1039,9 +1047,10 @@ shinyServer(function(input, output, session) {
         req(info)
         withProgress(message = 'Getting data for detailed plot...', value=0.5, {
             ### get refspec name
-            split <- strsplit(as.character(input$inSelect), "_")
-            inSelect <- as.character(split[[1]][1])
-
+            # split <- strsplit(as.character(input$inSelect), "_")
+            # inSelect <- as.character(split[[1]][1])
+            inSelect <- NULL
+            
             ### get info for present taxa in selected supertaxon (1)
             fullDf <- getFullData()
             if (input$tabs == "Customized profile") {
@@ -1050,7 +1059,7 @@ shinyServer(function(input, output, session) {
             ### filter data if needed
             if  (input$detailedFilter == TRUE) {
                 fullDf <- filteredDataHeat()
-                if (info[[4]] == inSelect) {
+                # if (info[[4]] == inSelect) {
                     fullDf <- fullDf[
                         fullDf$var1 >= input$var1[1]
                         & fullDf$var1 <= input$var1[2],
@@ -1059,7 +1068,7 @@ shinyServer(function(input, output, session) {
                         fullDf$var2 >= input$var2[1]
                         & fullDf$var2 <= input$var2[2],
                     ]
-                }
+                # }
                 updateCheckboxInput(
                     session, "detailedRemoveNA", value = TRUE
                 )
@@ -1346,7 +1355,7 @@ shinyServer(function(input, output, session) {
         downloadDf <- as.data.frame(downloadData())
         seqIDs <- downloadDf$orthoID
 
-        if (input$demoData == "none") {
+        # if (input$demoData == "none") {
             filein <- input$mainInput
             inputType <- checkInputValidity(filein$datapath)
             # get fata from oma
@@ -1386,15 +1395,15 @@ shinyServer(function(input, output, session) {
                     )
                 }
             }
-        } else {
-            if (input$demoData == "preCalcDt") {
-                if (!is.null(i_fastaInput))
-                    mainFastaOut <- getFastaFromFile(seqIDs, i_fastaInput)
-            } else {
-                # get fasta from demo online data
-                mainFastaOut <- getFastaDemo(seqIDs, demoData = input$demoData)
-            }
-        }
+        # } else {
+        #     if (input$demoData == "preCalcDt") {
+        #         if (!is.null(i_fastaInput))
+        #             mainFastaOut <- getFastaFromFile(seqIDs, i_fastaInput)
+        #     } else {
+        #         # get fasta from demo online data
+        #         mainFastaOut <- getFastaDemo(seqIDs, demoData = input$demoData)
+        #     }
+        # }
         return(mainFastaOut)
     })
 
@@ -1471,10 +1480,12 @@ shinyServer(function(input, output, session) {
     downloadCustomData <- callModule(
         downloadFilteredCustomized,
         "filteredCustomizedDownload",
-        data = downloadData,
+        data = cusFilteredDataHeat,
         fasta = customizedFastaDownload,
         inSeq = reactive(input$inSeq),
-        inTaxa = reactive(input$inTaxa)
+        inTaxa = reactive(input$inTaxa),
+        var1 = reactive(input$var1cus),
+        var2 = reactive(input$var2cus)
     )
 
     # ============================ ANALYSIS FUNCTIONS ==========================

@@ -146,7 +146,7 @@ createProfilePlot <- function(input, output, session,
         # get selected supertaxon name
         taxaList <- getNameList(taxDB())
         rankName <- rankSelect()
-        inSelect <- taxaList$ncbiID[taxaList$fullName == inSelect()]
+        # inSelect <- taxaList$ncbiID[taxaList$fullName == inSelect()]
 
         dataHeat <- dataHeat()
         if (is.null(dataHeat)) {

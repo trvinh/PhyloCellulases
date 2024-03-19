@@ -7,6 +7,10 @@
 #' @import energy
 #' @import shinyBS
 #' @import shinycssloaders
+#' @import PhyloProfile
+#' @import ape
+#' @import data.table
+#' @import ggplot2
 #' @rawNamespace import(RCurl, except = reset)
 #' @rawNamespace import(shinyjs, except = colourInput)
 

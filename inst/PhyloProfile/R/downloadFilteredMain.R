@@ -61,11 +61,11 @@ downloadFilteredMainUI <- function(id) {
             downloadButton(ns("downloadData"),
                            "Download filtered data")
         ),
-        column(
-            4,
-            downloadButton(ns("downloadFasta"),
-                           "Download FASTA sequences")
-        ),
+        # column(
+        #     4,
+        #     downloadButton(ns("downloadFasta"),
+        #                    "Download FASTA sequences")
+        # ),
         column(
             4,
             downloadButton(ns("downloadLong"),

@@ -275,22 +275,18 @@ shinyUI(
                             12,
                             style = "padding:0px;",
                             uiOutput("cusSelectTaxonRank.ui"),
-                            strong(h5("Choose (super)taxon of interest:")),
-                            selectizeInput(
-                                "inSelect", "", choices = NULL, selected = NULL
-                            )
                         ),
                         column(
                             12,
                             style = "padding:0px;",
                             uiOutput("cusTaxa.ui")
                         ),
+                        hr(),
                         column(
                             12,
                             style = "padding:0px;",
                             strong("Select sequence(s) of interest:")
                         ),
-                        
                         column(
                             12,
                             fluidRow(
@@ -307,7 +303,7 @@ shinyUI(
                         ),
                         
                         uiOutput("cusSuperRankSelect.ui"),
-
+                        hr(),
                         h5(""),
                         bsButton(
                             "plotCustom",
@@ -321,9 +317,13 @@ shinyUI(
                     mainPanel(
                         conditionalPanel(
                             condition = "output.sameProfile == true",
-                            h4(
-                                "Please select subset of genes and/
-                                or taxa for customized profile!"
+                            HTML(
+                                paste(
+                                    "<h4>Please select <span style=\"color: #ff6600;\">the taxonomy rank</span>,",
+                                    "choose <span style=\"color: #008000;\">supertaxa of interest</span>,",
+                                    "then click <span style=\"color: #0000ff;\"><em>Do plot</em></span>",
+                                    "to plot the profiles!</h4>"
+                                )
                             )
                         ),
                         createProfilePlotUI("customizedProfile")
