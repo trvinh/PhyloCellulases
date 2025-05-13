@@ -11,7 +11,7 @@ BugReports: https://github.com/BIONF/PhylopPCD/issues
 License: MIT + file LICENSE
 Depends: R (>= 4.4.0)
 Encoding: UTF-8
-biocViews: Software, Visualization, DataRepresentation, MultipleComparison, FunctionalPrediction
+biocViews: Software, Visualization, DataRepresentation, MultipleComparison, FunctionalPrediction, DimensionReduction
 Imports:
     ape, BiocStyle, colourpicker, data.table, DT, energy, ggplot2, RCurl,
     shinyBS, shinyjs, shinycssloaders, PhyloProfile (>= 2.0.0)
