@@ -14,11 +14,11 @@
 #' @rawNamespace import(RCurl, except = reset)
 #' @rawNamespace import(shinyjs, except = colourInput)
 
-runPhyloCellulase <- function(){
-    appDir <- system.file("PhyloProfile", package = "PhyloCellulase")
+runPhylopPCD <- function(){
+    appDir <- system.file("PhyloProfile", package = "PhylopPCD")
     if (appDir == "") {
         stop(
-            "Could not find apps directory. Try re-installing `PhyloCellulase`.",
+            "Could not find apps directory. Try re-installing `PhylopPCD`.",
             call = FALSE
         )
     }

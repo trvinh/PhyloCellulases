@@ -23,19 +23,20 @@ createDetailedPlotUI <- function(id) {
 }
 
 createDetailedPlot <- function(
-    input, output, session, data, var1ID, var2ID, detailedText, detailedHeight
+    input, output, session, data, var1ID, var2ID, detailedText, detailedHeight,
+    font
 ){
     # simplify ortho IDs if they are in BIONF format ---------------------------
     plotData <- reactive({
         plotDf <- data()
         if (
             checkBionfFormat(
-                plotDf$orthoID[1], plotDf$geneID[1], 
+                plotDf$orthoID[1], plotDf$geneID[1],
                 gsub('ncbi','',plotDf$abbrName[1])
             )
         ) {
             plotDf <- within(
-                plotDf, 
+                plotDf,
                 orthoMod <- data.frame(
                     do.call(
                         'rbind', strsplit(as.character(orthoID),'|', fixed=TRUE)
@@ -46,10 +47,10 @@ createDetailedPlot <- function(
         }
         return(plotDf)
     })
-    
+
     # render detailed plot -----------------------------------------------------
     output$detailPlot <- renderPlot({
-        detailPlot(plotData(), detailedText(), var1ID(), var2ID())
+        detailPlot(plotData(), detailedText(), var1ID(), var2ID(), font())
     })
 
     output$detailPlot.ui <- renderUI({
@@ -66,18 +67,18 @@ createDetailedPlot <- function(
 
     output$downloadDetailed <- downloadHandler(
         filename = function() {
-            c("detailedPlot.pdf")
+            c("detailedPlot.svg")
         },
         content = function(file) {
-            g <- detailPlot(data(), detailedText(), var1ID(), var2ID())
+            g <- detailPlot(data(), detailedText(), var1ID(), var2ID(), font())
             ggsave(
                 file,
                 plot = g,
-                width = 800 * 0.056458333,
-                height = detailedHeight() * 0.056458333,
+                width = 800 * 0.035,
+                height = detailedHeight() * 0.035,
                 units = "cm",
                 dpi = 300,
-                device = "pdf",
+                device = "svg",
                 limitsize = FALSE
             )
         }
@@ -87,7 +88,7 @@ createDetailedPlot <- function(
     pointInfoDetail <- reactive({
         selDf <- data()
         selDf$orthoID <- as.character(selDf$orthoID)
-        
+
         # if only one ortholog, get directly from data()
         if (nrow(selDf) == 1) {
             seedID <- as.character(selDf$geneID)
@@ -106,22 +107,22 @@ createDetailedPlot <- function(
             orthoID <- as.character(selDf$orthoID[corX])
             taxID <- as.character(selDf$abbrName[corX])
         }
-        
+
         # get var1, var2
         var1 <- as.list(selDf$var1[selDf$orthoID == orthoID])
         var1 <- as.character(var1[!is.na(var1)])
         var2 <- as.list(selDf$var2[selDf$orthoID == orthoID])
         var2 <- as.character(var2[!is.na(var2)])
         if (length(var2) == 0) var2 = "NA"
-        
+
         ncbiID <- selDf[selDf$orthoID == orthoID, ]$abbrName
         ncbiID <- as.character(ncbiID[!is.na(ncbiID)][1])
 
         # return info
-        if (is.na(orthoID)) 
+        if (is.na(orthoID))
             return(NULL)
         else {
-            if (orthoID != "NA") 
+            if (orthoID != "NA")
                 return(c(seedID, orthoID, var1, var2, ncbiID))
         }
     })
@@ -153,10 +154,11 @@ createDetailedPlot <- function(
 #' @param detailedText text size (input$detailedText)
 #' @param var1ID name of variable 1 (input$var1ID)
 #' @param var2ID name of variable 2 (input$var2ID)
+#' @param font font of text. Default = Arial"
 #' @return detailed plot (ggplot object)
 #' @author Vinh Tran {tran@bio.uni-frankfurt.de}
 
-detailPlot <- function(selDf, detailedText, var1ID, var2ID){
+detailPlot <- function(selDf, detailedText, var1ID, var2ID, font = "Arial"){
     selDf$xLabel <- paste(selDf$orthoID, " (", selDf$fullName, ")", sep = "")
 
     # create joined DF for plotting var1 next to var2
@@ -169,7 +171,12 @@ detailPlot <- function(selDf, detailedText, var1ID, var2ID){
     colnames(var2Df) <- c("id", "score", "var")
 
     detailedDf <- rbind(var1Df, var2Df)
-
+    if(any(is.na(detailedDf$score))) {
+        detailedDf[
+            detailedDf$id %in% detailedDf$id[is.na(detailedDf$score)],
+        ]$score <- NA
+    }
+    
     # remove ONE missing variable
     if (nlevels(as.factor(detailedDf$var)) > 1) {
         detailedDf <- detailedDf[nchar(detailedDf$var) > 0, ]
@@ -188,7 +195,8 @@ detailPlot <- function(selDf, detailedText, var1ID, var2ID){
     gp <- gp + theme(axis.text.x = element_text(angle = 90, hjust = 1),
                      axis.text = element_text(size = detailedText),
                      axis.title = element_text(size = detailedText),
-                     legend.text = element_text(size = detailedText)
+                     legend.text = element_text(size = detailedText),
+                     text = element_text(family = font)
     )
     return(gp)
 }

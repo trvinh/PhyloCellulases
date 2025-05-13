@@ -36,7 +36,7 @@ clusterProfile <- function(input, output, session,
     # Reactive function holding data for clustering ============================
     clusterData <- reactive({
         if (is.null(distanceMatrix)) stop("Distance matrix is NULL!")
-        df <- clusterDataDend(distanceMatrix(), clusterMethod())
+        df <- clusterDataDend(as.dist(distanceMatrix()), clusterMethod())
         return(df)
     })
 
@@ -82,7 +82,7 @@ clusterProfile <- function(input, output, session,
     # Brushed cluster table ====================================================
     #' render brushedCluster.table based on clicked point on dendrogram plot
     brushedClusterGene <- reactive({
-		clusteredTree <- as.phylo(clusterData())
+		clusteredTree <- ape::as.phylo(clusterData())
 		labels <- rev(sortTaxaFromTree(clusteredTree))
 
         # get list of selected gene(s)

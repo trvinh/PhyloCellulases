@@ -1,21 +1,21 @@
-Package: PhyloCellulase
+Package: PhylopPCD
 Version: 0.0.1
-Date: 2024-03-05
-Title: PhyloCellulase
+Date: 2025-05-13
+Title: PhylopPCD
 Authors@R: c(
     person("Vinh", "Tran", role = c("aut", "cre"), email = "tran@bio.uni-frankfurt.de"),
     person("Ingo", "Ebersberger", role = "aut", email = "ebersberger@bio.uni-frankfurt.de"))
 Description: PhyloProfile is a tool for exploring complex phylogenetic profiles. Phylogenetic profiles, presence/absence patterns of genes over a set of species, are commonly used to trace the functional and evolutionary history of genes across species and time. With PhyloProfile we can enrich regular phylogenetic profiles with further data like sequence/structure similarity, to make phylogenetic profiling more meaningful. Besides the interactive visualisation powered by R-Shiny, the package offers a set of further analysis features to gain insights like the gene age estimation or core gene identification.
-URL: https://github.com/BIONF/PhyloCellulase/
-BugReports: https://github.com/BIONF/PhyloCellulase/issues
+URL: https://github.com/BIONF/PhylopPCD/
+BugReports: https://github.com/BIONF/PhylopPCD/issues
 License: MIT + file LICENSE
-Depends: R (>= 4.1.0)
+Depends: R (>= 4.4.0)
 Encoding: UTF-8
 biocViews: Software, Visualization, DataRepresentation, MultipleComparison, FunctionalPrediction
 Imports:
     ape, BiocStyle, colourpicker, data.table, DT, energy, ggplot2, RCurl,
-    shinyBS, shinyjs, shinycssloaders, PhyloProfile (>= 1.6.4)
-RoxygenNote: 7.2.3
+    shinyBS, shinyjs, shinycssloaders, PhyloProfile (>= 2.0.0)
+RoxygenNote: 7.3.2
 Suggests:
     knitr, rmarkdown, testthat, bioDist, Biostrings,
     gridExtra, pbapply, RColorBrewer, shiny, OmaDB, plyr, xml2, zoo
