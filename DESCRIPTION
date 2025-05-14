@@ -1,6 +1,6 @@
 Package: PhylopPCD
 Version: 0.0.1
-Date: 2025-05-13
+Date: 2025-05-14
 Title: PhylopPCD
 Authors@R: c(
     person("Vinh", "Tran", role = c("aut", "cre"), email = "tran@bio.uni-frankfurt.de"),
@@ -14,7 +14,7 @@ Encoding: UTF-8
 biocViews: Software, Visualization, DataRepresentation, MultipleComparison, FunctionalPrediction, DimensionReduction
 Imports:
     ape, BiocStyle, colourpicker, data.table, DT, energy, ggplot2, RCurl,
-    shinyBS, shinyjs, shinycssloaders, PhyloProfile (>= 2.0.0)
+    shinyBS, shinyjs, shinycssloaders, PhyloProfile (>= 2.0.1)
 RoxygenNote: 7.3.2
 Suggests:
     knitr, rmarkdown, testthat, bioDist, Biostrings,

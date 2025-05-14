@@ -63,7 +63,7 @@ shinyServer(function(input, output, session) {
         fileExist <- file.exists("data/cell_wall.extended.fa")
         if (fileExist == FALSE) {
             msg <- paste0(
-                "Please wait while fasta data are being downloaded!!!"
+                paste("Please wait while fasta data are being downloaded!!!", getwd())
             )
             createAlert(
                 session, "fileExistMsgUI", "fileExistMsg", title = "",
@@ -71,11 +71,14 @@ shinyServer(function(input, output, session) {
                 append = FALSE
             )
             download.file(
-                "https://applbio.biologie.uni-frankfurt.de/download/fDOG_pPCD/cellulase_pp_data.tar.gz",
+                "https://applbio.biologie.uni-frankfurt.de/download/cellulase_pp_data.tar.gz",
                 destfile = "cellulase_pp_data.tar.gz",
                 method = "libcurl"
             )
-            untar("cellulase_data.tar.gz")
+            tarFile <- system.file(
+                "PhyloProfile", "cellulase_pp_data.tar.gz", package = "PhylopPCD", mustWork = TRUE
+            )
+            untar(tarFile)
         } else closeAlert(session, "fileExistMsg")
         # remove the downloaded tar.gz file after extracting
         fileExist <- file.exists("data/cell_wall.extended.fa")

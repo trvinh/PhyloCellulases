@@ -1,6 +1,6 @@
 # Phylo-pPCD
 
-This is a lite version of [PhyloProfile](https://github.com/BIONF/PhyloProfile), which is pre-configured only for its use with the data of 235 [potential plant cell wall degrading (pPCD) enzymes across the tree of life](https://applbio.biologie.uni-frankfurt.de/download/fDOG_pPCD/cellulase_pp_data.tar.gz).
+This is a lite version of [PhyloProfile](https://github.com/BIONF/PhyloProfile), which is pre-configured only for its use with the data of 235 [potential plant cell wall degrading (pPCD) enzymes across the tree of life](https://applbio.biologie.uni-frankfurt.de/download/cellulase_pp_data.tar.gz).
 
 Users can display the full data set, customized subsets of the pPCD enzymes and taxa, zoom in on individual ortholog pairs, and ultimately display the domain architectures of the orthologs. Interactive links connect the information about taxon, protein sequence and Pfam (El-Gebali, et al. 2019) or SMART domains (Letunic, et al. 2009) with the corresponding public databases.
 
