@@ -15,6 +15,12 @@ options(
 
 #' MAIN SERVER =================================================================
 shinyServer(function(input, output, session) {
+    # Avoid time-out for Shiny server
+    keep_alive <- shiny::reactiveTimer(
+        intervalMs = 10000, session = shiny::getDefaultReactiveDomain()
+    )
+    shiny::observe({keep_alive()})
+    
     homePath = c(wd='~/')
     # Automatically stop a Shiny app when closing the browser tab
     session$allowReconnect(TRUE)
@@ -82,7 +88,10 @@ shinyServer(function(input, output, session) {
         } else closeAlert(session, "fileExistMsg")
         # remove the downloaded tar.gz file after extracting
         fileExist <- file.exists("data/cell_wall.extended.fa")
-        if (fileExist == TRUE) file.remove("cellulase_pp_data.tar.gz")
+        if (fileExist == TRUE) {
+            if (file.exists("cellulase_pp_data.tar.gz"))
+                file.remove("cellulase_pp_data.tar.gz")
+        }
     })
 
     # # * check for the existence of taxonomy files ------------------------------
